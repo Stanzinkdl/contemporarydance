@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { SKELETON, loadBoneGeometries, joint, offset } from './skeleton.js';
 import { buildBody, attachBones, setBodyStyle, makeMats, cssVar } from './figure.js';
+import { createOrbit } from './orbit.js';
 
 // Plays CMU motion-capture recordings of real dancers on the same anatomical
 // skeleton. Only the recorded *rotations* are used; bone lengths stay those of
@@ -12,19 +13,19 @@ import { buildBody, attachBones, setBodyStyle, makeMats, cssVar } from './figure
 
 // Our segment → the CMU bone whose rotation drives it.
 const DRIVER = {
-  pelvis: 'root', lumbar: 'lowerback', thorax: 'thorax', neck: 'lowerneck', head: 'head',
-  upperArmL: 'lhumerus', foreArmL: 'lradius', handL: 'lhand',
-  upperArmR: 'rhumerus', foreArmR: 'rradius', handR: 'rhand',
-  thighL: 'lfemur', shinL: 'ltibia', footL: 'lfoot',
-  thighR: 'rfemur', shinR: 'rtibia', footR: 'rfoot',
+  pelvis: 'root', lumbar: 'lowerback', thorax: 'upperback', chest: 'thorax', neck: 'lowerneck', head: 'head',
+  girdleL: 'lclavicle', upperArmL: 'lhumerus', foreArmL: 'lradius', handL: 'lhand', fingersL: 'lfingers',
+  girdleR: 'rclavicle', upperArmR: 'rhumerus', foreArmR: 'rradius', handR: 'rhand', fingersR: 'rfingers',
+  thighL: 'lfemur', shinL: 'ltibia', footL: 'lfoot', toesL: 'ltoes',
+  thighR: 'rfemur', shinR: 'rtibia', footR: 'rfoot', toesR: 'rtoes',
 };
 // Our segment hierarchy (parent segment).
 const PARENT = {
-  pelvis: null, lumbar: 'pelvis', thorax: 'lumbar', neck: 'thorax', head: 'neck',
-  upperArmL: 'thorax', foreArmL: 'upperArmL', handL: 'foreArmL',
-  upperArmR: 'thorax', foreArmR: 'upperArmR', handR: 'foreArmR',
-  thighL: 'pelvis', shinL: 'thighL', footL: 'shinL',
-  thighR: 'pelvis', shinR: 'thighR', footR: 'shinR',
+  pelvis: null, lumbar: 'pelvis', thorax: 'lumbar', chest: 'thorax', neck: 'chest', head: 'neck',
+  girdleL: 'chest', upperArmL: 'girdleL', foreArmL: 'upperArmL', handL: 'foreArmL', fingersL: 'handL',
+  girdleR: 'chest', upperArmR: 'girdleR', foreArmR: 'upperArmR', handR: 'foreArmR', fingersR: 'handR',
+  thighL: 'pelvis', shinL: 'thighL', footL: 'shinL', toesL: 'footL',
+  thighR: 'pelvis', shinR: 'thighR', footR: 'shinR', toesR: 'footR',
 };
 const ORDER = Object.keys(PARENT);
 const D2R = Math.PI / 180;
@@ -192,12 +193,14 @@ export function createMocapScene(container, { style: initialStyle = 'skeleton', 
   }
 
   const clock = new THREE.Clock();
-  const look = new THREE.Vector3();
-  const camPos = new THREE.Vector3(2.2, 1.6, 5.2);
+  camera.position.set(1.2, 1.35, 5.4);
+  const orbit = createOrbit({ camera, renderer, container, height: 0.9 });
+  let time = 0;
   function frame() {
     requestAnimationFrame(frame);
     const dt = Math.min(clock.getDelta(), 0.05);
     if (!visible || !frames) return;
+    time += dt;
     if (playing) t += dt * speed;
     const n = frames.length;
     const pos = (t * fps) % n;
@@ -214,15 +217,12 @@ export function createMocapScene(container, { style: initialStyle = 'skeleton', 
     poseFromFrame(body, f, base);
     body.root.position.y -= floorY;
 
-    // Camera follows the dancer gently.
+    // The camera follows the dancer; drag to look from any side.
     body.pelvis.getWorldPosition(tmp);
-    look.lerp(tmp.setY(0.9), 0.08);
-    camera.position.lerp(new THREE.Vector3(look.x + 2.2, 1.6, look.z + 5.2), 0.05);
-    camera.lookAt(look);
+    orbit.update({ follow: tmp, time, distance: 5.4 });
     renderer.render(scene, camera);
   }
   frame();
-  camera.position.copy(camPos);
 
   return {
     load,

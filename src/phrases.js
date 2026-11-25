@@ -10,22 +10,27 @@
 //   root.x / root.y / root.z   whole-body pitch / facing / roll, pivoting at the floor
 //   travel.x / travel.z (m)    stepping away from the home spot
 //   pelvis.x/y/z, pelvis.shift  pelvic tilt / turn / side tilt, side shift (m)
-//   s1 (lumbar), s2 (thorax), neck, head: x = bend forward(+)/back(−), y = twist, z = side bend
-//   arms: f = forward raise, a = side raise, t = rotation, e = elbow bend, w = wrist bend
+//   s1 (lumbar), s2 (lower thorax), s3 (upper chest), neck, head:
+//       x = bend forward(+)/back(−), y = twist, z = side bend.
+//       If a move gives s2 but not s3, the bend is shared across both.
+//   arms: f = forward raise, a = side raise, t = rotation, e = elbow bend, w = wrist bend,
+//         c = finger curl (0 open … 1.6 fist), sh = shoulder shrug, pr = shoulder reach forward
 //   legs: f = hip flexion (knee forward), a = leg out to the side, t = turnout,
-//         k = knee bend, p = point the foot (0 keeps the sole flat to the floor)
+//         k = knee bend, p = point the foot (0 keeps the sole flat to the floor),
+//         d = on half-toe (1 keeps the toes flat on the floor while the heel lifts)
+//   lift (m)                    height of a jump
 // "L" is the dancer's left (+x). A partner dances the mirror image.
 
 export const KEYS = [
   'root.x', 'root.y', 'root.z', 'travel.x', 'travel.z',
   'pelvis.x', 'pelvis.y', 'pelvis.z', 'pelvis.shift',
-  ...['s1', 's2', 'neck', 'head'].flatMap((g) => [`${g}.x`, `${g}.y`, `${g}.z`]),
-  ...['armL', 'armR'].flatMap((g) => ['f', 'a', 't', 'e', 'w'].map((c) => `${g}.${c}`)),
-  ...['legL', 'legR'].flatMap((g) => ['f', 'a', 't', 'k', 'p'].map((c) => `${g}.${c}`)),
-  'shake',
+  ...['s1', 's2', 's3', 'neck', 'head'].flatMap((g) => [`${g}.x`, `${g}.y`, `${g}.z`]),
+  ...['armL', 'armR'].flatMap((g) => ['f', 'a', 't', 'e', 'w', 'c', 'sh', 'pr'].map((c) => `${g}.${c}`)),
+  ...['legL', 'legR'].flatMap((g) => ['f', 'a', 't', 'k', 'p', 'd'].map((c) => `${g}.${c}`)),
+  'shake', 'lift',
 ];
 const DEFAULTS = Object.fromEntries(KEYS.map((k) => [k, 0]));
-Object.assign(DEFAULTS, { 'armL.a': 0.05, 'armR.a': 0.05, 'armL.e': 0.15, 'armR.e': 0.15 });
+Object.assign(DEFAULTS, { 'armL.a': 0.05, 'armR.a': 0.05, 'armL.e': 0.15, 'armR.e': 0.15, 'armL.c': 0.35, 'armR.c': 0.35 });
 
 export function normalize(spec) {
   const out = { ...DEFAULTS };
@@ -37,12 +42,22 @@ export function normalize(spec) {
     const targets = group === 'arms' ? ['armL', 'armR'] : group === 'legs' ? ['legL', 'legR'] : [group];
     for (const t of targets) for (const [c, v] of Object.entries(comps)) out[`${t}.${c}`] = v;
   }
+  // Share a thoracic bend between the lower thorax and upper chest.
+  if (!spec.s3) for (const c of ['x', 'y', 'z']) {
+    out[`s3.${c}`] = out[`s2.${c}`] * 0.5;
+    out[`s2.${c}`] *= 0.5;
+  }
   return out;
+}
+
+// Phrases added at runtime (e.g. one section of a class in the studio viewer).
+export function registerPhrase(id, def) {
+  PHRASES[id] = def;
 }
 
 const NEGATE_ON_MIRROR = [
   'root.y', 'root.z', 'travel.x', 'pelvis.y', 'pelvis.z', 'pelvis.shift',
-  's1.y', 's1.z', 's2.y', 's2.z', 'neck.y', 'neck.z', 'head.y', 'head.z',
+  's1.y', 's1.z', 's2.y', 's2.z', 's3.y', 's3.z', 'neck.y', 'neck.z', 'head.y', 'head.z',
 ];
 export function mirrorPose(P) {
   const out = { ...P };
@@ -88,7 +103,7 @@ export const MOVES = {
   },
   releve: {
     label: 'Relevé',
-    pose: () => ({ legs: { t: 0.5, p: 0.85 }, arms: { f: 2.8, a: 0.3, e: 0.45 }, s2: { x: -0.08 }, head: { x: -0.12 } }),
+    pose: () => ({ legs: { t: 0.5, p: 0.85, d: 1 }, arms: { f: 2.8, a: 0.3, e: 0.45, c: 0.2 }, s2: { x: -0.08 }, head: { x: -0.12 } }),
   },
 
   // ---- Graham ----
@@ -177,7 +192,7 @@ export const MOVES = {
   },
   hHinge: {
     label: 'Hinge',
-    pose: () => ({ pelvis: { x: -0.55 }, legs: { f: 0.0, k: 1.15, p: 0.75 }, arms: { f: 1.0, e: 0.05 }, head: { x: 0.25 } }),
+    pose: () => ({ pelvis: { x: -0.55 }, legs: { f: 0.0, k: 1.15, p: 0.75, d: 1 }, arms: { f: 1.0, e: 0.05 }, head: { x: 0.25 } }),
   },
   hSquat: {
     label: 'Primitive squat',
@@ -205,7 +220,7 @@ export const MOVES = {
   },
   lSwingUp: {
     label: 'Suspension',
-    pose: () => ({ legs: { p: 0.55, f: 0.05 }, s2: { x: -0.15 }, head: { x: -0.2 }, arms: { f: 2.9, a: 0.35, e: 0.2, w: -0.3 } }),
+    pose: () => ({ legs: { p: 0.55, f: 0.05, d: 1 }, s2: { x: -0.15 }, head: { x: -0.2 }, arms: { f: 2.9, a: 0.35, e: 0.2, w: -0.3, c: 0.15 } }),
   },
   lHeadDrop: {
     label: 'Head and torso drop',
@@ -222,7 +237,7 @@ export const MOVES = {
   },
   lRebound: {
     label: 'Rebound',
-    pose: () => ({ legs: { p: 0.5 }, arms: { a: 2.0, f: 0.4, e: 0.2, w: -0.3 }, s2: { x: -0.22 }, neck: { x: -0.15 }, head: { x: -0.2 } }),
+    pose: () => ({ legs: { p: 0.5, d: 1 }, arms: { a: 2.0, f: 0.4, e: 0.2, w: -0.3, c: 0.15 }, s2: { x: -0.22 }, neck: { x: -0.15 }, head: { x: -0.2 } }),
   },
   lSuccession: {
     label: 'Successional arms',
@@ -294,7 +309,7 @@ export const MOVES = {
   },
   cAttitude: {
     label: 'Attitude balance',
-    pose: () => ({ legL: { f: -0.75, a: 0.2, t: 0.6, k: 1.2, p: 0.9 }, legR: { t: 0.6, p: 0.7 }, pelvis: { x: 0.15 }, s2: { x: -0.15 }, armL: { f: 2.8, a: 0.2, e: 0.4 }, armR: { a: 1.4, e: 0.2 } }),
+    pose: () => ({ legL: { f: -0.75, a: 0.2, t: 0.6, k: 1.2, p: 0.9 }, legR: { t: 0.6, p: 0.7, d: 1 }, pelvis: { x: 0.15 }, s2: { x: -0.15 }, armL: { f: 2.8, a: 0.2, e: 0.4 }, armR: { a: 1.4, e: 0.2 } }),
   },
 
   // ---- Butoh ----
@@ -303,7 +318,7 @@ export const MOVES = {
     pose: (p) => ({
       legs: { f: 0.75, a: 0.32, t: 0.55, k: 1.25 },
       pelvis: { x: 0.15 }, s1: { x: 0.1 }, s2: { x: 0.25 * T(p) }, neck: { x: -0.15 }, head: { x: 0.05 },
-      arms: { f: 0.55, a: 0.35, e: 1.5, w: 1.1, t: 0.4 },
+      arms: { f: 0.55, a: 0.35, e: 1.5, w: 1.1, t: 0.4, c: 1.0 },
     }),
   },
   bWalkL: {
@@ -480,6 +495,184 @@ export const MOVES = {
   },
 };
 
+
+// ---------------------------------------------------------------------------
+// More moves: class exercises and the six later-added techniques
+// ---------------------------------------------------------------------------
+Object.assign(MOVES, {
+  // ---- Class extras for the original techniques ----
+  gSideFall: {
+    label: 'Side fall',
+    pose: () => ({ root: { z: 1.35 }, legs: { f: 0.9, k: 1.4 }, s2: { x: 0.2 }, head: { z: -0.2 }, armL: { a: 2.6, e: 0.15, c: 0.2 }, armR: { f: 0.8, e: 0.6 } }),
+  },
+  gTripletL: {
+    label: 'Triplets',
+    pose: () => ({ 'travel.z': 0.3, legL: { f: 0.5, k: 0.55 }, legR: { f: -0.25, p: 0.6, d: 1 }, s2: { y: 0.15 }, arms: { a: 1.1, f: 0.3, e: 0.3, c: 0.2 } }),
+  },
+  gTripletR: {
+    label: 'Triplets',
+    pose: () => ({ 'travel.z': 0.6, legR: { f: 0.5, k: 0.55 }, legL: { f: -0.25, p: 0.6, d: 1 }, s2: { y: -0.15 }, arms: { a: 1.1, f: 0.3, e: 0.3, c: 0.2 } }),
+  },
+  hProg: {
+    label: 'Lunge progression',
+    pose: () => ({ 'travel.z': 0.35, legL: { f: 1.0, k: 1.3 }, legR: { f: -0.45, p: 0.4, d: 1 }, arms: { a: 1.55, e: 0.02, c: 0.1 } }),
+  },
+  lRun: {
+    label: 'Run and suspend',
+    pose: () => ({ lift: 0.08, 'travel.z': 0.4, legL: { f: 0.9, k: 1.0 }, legR: { f: -0.6, k: 0.6, p: 0.9 }, arms: { a: 1.6, f: 0.5, e: 0.2, c: 0.15 }, s2: { x: -0.15 }, head: { x: -0.2 } }),
+  },
+  dTendu: {
+    label: 'Barre tendu',
+    pose: () => ({ legL: { a: 0.5, t: 0.5, p: 1.0 }, legR: { t: 0.5 }, armR: { a: 1.3, f: 0.3, e: 0.3 }, armL: { f: 0.45, a: 0.25, e: 0.6 }, head: { y: -0.2 } }),
+  },
+  dShoulderL: {
+    label: 'Shoulder isolation',
+    pose: () => ({ armL: { sh: 1.0, a: 0.9, f: 0.3, e: 1.2 }, armR: { a: 0.9, f: 0.3, e: 1.2 }, legs: { f: 0.35, k: 0.7, a: 0.12 }, head: { z: 0.1 } }),
+  },
+  dShoulderR: {
+    label: 'Shoulder isolation',
+    pose: () => ({ armR: { sh: 1.0, a: 0.9, f: 0.3, e: 1.2 }, armL: { a: 0.9, f: 0.3, e: 1.2 }, legs: { f: 0.35, k: 0.7, a: 0.12 }, head: { z: -0.1 } }),
+  },
+  cDegage: {
+    label: 'Dégagé',
+    pose: () => ({ legL: { f: 0.85, t: 0.6, p: 1.0 }, legR: { t: 0.6 }, arms: { a: 1.4, e: 0.1, c: 0.2 }, head: { y: 0.1 } }),
+  },
+  cJete: {
+    label: 'Jeté',
+    pose: () => ({ lift: 0.28, 'travel.z': 0.3, legL: { f: 1.0, t: 0.5, k: 0.1, p: 1 }, legR: { f: -0.85, t: 0.5, k: 0.1, p: 1 }, arms: { a: 1.4, f: 0.6, e: 0.15, c: 0.15 }, s2: { x: -0.1 } }),
+  },
+  bFlower: {
+    label: 'Flower hands',
+    pose: () => ({ legs: { f: 0.7, a: 0.3, t: 0.55, k: 1.2 }, s3: { x: -0.15 }, head: { x: -0.3 }, arms: { f: 2.4, a: 0.3, e: 1.0, w: -0.6, c: 0.05 } }),
+  },
+
+  // ---- Wigman ----
+  wTension: {
+    label: 'Tension',
+    pose: () => ({ legs: { f: 1.0, k: 1.6, a: 0.3 }, s1: { x: 0.35 }, s2: { x: 0.4 }, head: { x: 0.2 }, arms: { f: 1.0, a: 0.6, e: 1.6, c: 1.6, sh: 0.7 } }),
+  },
+  wRelax: {
+    label: 'Relaxation',
+    pose: () => ({ ...hinge(0.7, { k: 0.5 }), s2: { x: 0.4 }, neck: { x: 0.5 }, head: { x: 0.3 }, arms: { f: 1.3, e: 0.1, c: 0.2 } }),
+  },
+  wReach: {
+    label: 'Reaching into space',
+    pose: () => ({ legL: { f: 1.0, k: 1.2, a: 0.3 }, legR: { a: 0.4, k: 0.05, p: 0.3 }, armL: { f: 2.4, a: 0.9, e: 0.02, c: 0.05 }, armR: { a: 1.0, f: -0.5, e: 0.1 }, s2: { x: -0.2, y: 0.3 }, head: { x: -0.25, y: 0.3 } }),
+  },
+  wTurnA: {
+    label: 'Ecstatic turning',
+    pose: () => ({ root: { y: 2.6 }, legs: { p: 0.3, d: 1 }, arms: { a: 1.5, e: 0.3, c: 0.2 }, s3: { x: -0.2 }, head: { x: -0.25 } }),
+  },
+  wTurnB: {
+    label: 'Ecstatic turning',
+    pose: () => ({ root: { y: 5.2 }, legs: { p: 0.3, d: 1 }, arms: { a: 2.2, e: 0.2, c: 0.1 }, s3: { x: -0.25 }, head: { x: -0.35 } }),
+  },
+  wWitch: {
+    label: 'Witch Dance',
+    // Seated on the floor: knees high and open so the pelvis reaches the floor with the soles flat.
+    pose: () => ({ legs: { f: 2.4, a: 0.55, k: 2.5, t: 0.3 }, pelvis: { x: -0.1 }, s2: { x: 0.35 }, head: { x: -0.15 }, arms: { f: 1.0, a: 0.7, e: 1.3, w: -0.6, c: 1.0, sh: 0.6 } }),
+  },
+
+  // ---- Humphrey–Weidman ----
+  hwBreath: {
+    label: 'Breath rhythm',
+    pose: () => ({ legs: { p: 0.4, d: 1 }, s3: { x: -0.2 }, head: { x: -0.15 }, arms: { a: 1.0, f: 0.3, e: 0.5, c: 0.2 } }),
+  },
+  hwWaterCurl: {
+    label: 'Water Study: curl',
+    // Kneeling, sitting back on the heels, curled forward over the knees.
+    pose: () => ({ legs: { f: 2.35, k: 2.8, p: 1.2 }, pelvis: { x: 0.8 }, s1: { x: 0.5 }, s2: { x: 0.5 }, neck: { x: 0.4 }, head: { x: 0.2 }, arms: { f: 2.0, e: 0.2, c: 0.2 } }),
+  },
+  hwWaterRise: {
+    label: 'Water Study: wave rises',
+    pose: () => ({ legs: { f: -0.2, k: 1.6, p: 1.2 }, pelvis: { x: -0.2 }, s2: { x: -0.2 }, head: { x: -0.2 }, arms: { f: 2.3, a: 0.3, e: 0.3, c: 0.2 } }),
+  },
+  hwPantomime: {
+    label: 'Weidman pantomime',
+    pose: () => ({ armL: { f: 0.7, a: 0.3, e: 2.2, t: 0.6, c: 0.6 }, armR: { f: 1.5, a: 0.6, e: 0.1, c: 0.9 }, head: { y: -0.3 }, s3: { y: -0.2 }, legR: { f: 0.3, k: 0.3 } }),
+  },
+
+  // ---- Hawkins ----
+  hkSwing: {
+    label: 'Free-flow swing',
+    pose: () => ({ arms: { f: 1.6, a: 0.2, e: 0.4, c: 0.2 }, s2: { x: 0.1 }, legs: { f: 0.25, k: 0.45 } }),
+  },
+  hkSwingBack: {
+    label: 'Free-flow swing',
+    pose: () => ({ arms: { f: -0.6, a: 0.2, e: 0.2, c: 0.3 }, s2: { x: -0.05 }, legs: { f: 0.2, k: 0.4 } }),
+  },
+  hkPelvicWalk: {
+    label: 'Walking from the pelvis',
+    pose: () => ({ 'travel.z': 0.25, pelvis: { x: -0.15, y: 0.15 }, legL: { f: 0.5, k: 0.4 }, legR: { p: 0.3 }, arms: { a: 0.3, e: 0.3 } }),
+  },
+  hkArc: {
+    label: 'Arc of the arm',
+    pose: () => ({ armL: { a: 2.0, f: 0.6, e: 0.3, c: 0.1 }, armR: { a: 0.5, e: 0.3 }, s3: { z: -0.15, y: 0.2 }, head: { y: 0.25 }, legs: { f: 0.1, k: 0.2 } }),
+  },
+  hkBalance: {
+    label: 'Effortless balance',
+    pose: () => ({ legL: { f: 0.6, k: 1.0, t: 0.3 }, legR: { p: 0.4, d: 1 }, arms: { f: 1.3, a: 0.4, e: 0.6, c: 0.3 } }),
+  },
+
+  // ---- Nikolais / Louis ----
+  nElbowLead: {
+    label: 'Decentralised: elbow leads',
+    pose: () => ({ armL: { a: 1.2, f: 0.6, e: 1.9, w: 0.5 }, s3: { z: -0.25, y: 0.3 }, pelvis: { shift: 0.04 }, legs: { f: 0.3, k: 0.5 } }),
+  },
+  nKneeLead: {
+    label: 'Decentralised: knee leads',
+    pose: () => ({ legL: { f: 1.3, k: 1.6, a: 0.4, t: 0.3 }, legR: { p: 0.3, d: 1 }, s2: { z: 0.15 }, arms: { a: 0.6, e: 0.8 } }),
+  },
+  nShape: {
+    label: 'Sculpting space',
+    pose: () => ({ armL: { f: 2.3, a: 0.3, e: 1.4, w: 0.9 }, armR: { a: 1.6, e: 1.5, w: -0.6 }, s3: { y: -0.4 }, head: { y: 0.3 }, legs: { a: 0.35, k: 0.3, t: 0.4 } }),
+  },
+  nExpand: {
+    label: 'Expanding volume',
+    pose: () => ({ arms: { a: 1.9, f: 0.3, e: 0.05, c: 0 }, legs: { a: 0.45 }, s3: { x: -0.15 }, head: { x: -0.2 } }),
+  },
+  nContract: {
+    label: 'Shrinking volume',
+    pose: () => ({ legs: { f: 1.6, k: 2.3, a: 0.2 }, s1: { x: 0.45 }, s2: { x: 0.5 }, neck: { x: 0.4 }, arms: { f: 1.0, a: 0.2, e: 2.0, c: 1.2 } }),
+  },
+
+  // ---- Taylor ----
+  tTilt: {
+    label: 'Taylor tilt',
+    pose: () => ({ legL: { a: 1.25, t: 0.5, p: 1 }, legR: { t: 0.5, k: 0.05 }, s1: { z: 0.3 }, s2: { z: 0.4 }, armL: { a: 2.6, e: 0.1 }, armR: { a: 1.4, e: 0.05 }, head: { z: 0.1 } }),
+  },
+  tRun: {
+    label: 'Run',
+    pose: () => ({ lift: 0.06, 'travel.z': 0.45, legL: { f: 0.9, k: 1.1 }, legR: { f: -0.5, k: 0.8, p: 0.8 }, arms: { f: 0.6, a: 0.3, e: 0.9 }, s2: { x: 0.1 } }),
+  },
+  tFall: {
+    label: 'Fall and roll',
+    pose: () => ({ root: { z: 1.3 }, legs: { f: 1.2, k: 1.4 }, arms: { a: 2.2, e: 0.2 }, s2: { x: 0.2 } }),
+  },
+  tAureole: {
+    label: 'Lyrical arms',
+    pose: () => ({ legL: { f: 0.5, t: 0.4, p: 1 }, legR: { t: 0.4, k: 0.1 }, arms: { a: 1.7, f: 0.4, e: 0.25, w: -0.3, c: 0.1 }, s3: { x: -0.15 }, head: { x: -0.2 } }),
+  },
+
+  // ---- Klein ----
+  kFloor: {
+    label: 'Deep support on the floor',
+    pose: () => ({ root: { x: -1.5 }, legs: { f: 0.4, k: 0.4 }, arms: { a: 0.5, e: 0.2 } }),
+  },
+  kAlign: {
+    label: 'Standing alignment',
+    pose: () => ({ legs: { f: 0.05, k: 0.1, a: 0.03 }, arms: { a: 0.08, e: 0.1, c: 0.3 } }),
+  },
+  kRollDown: {
+    label: 'Roll down through the spine',
+    pose: () => ({ ...hinge(1.0, { k: 0.35 }), s1: { x: 0.5 }, s2: { x: 0.6 }, neck: { x: 0.5 }, head: { x: 0.3 }, arms: { f: 2.0, e: 0.05, c: 0.3 } }),
+  },
+  kRotation: {
+    label: 'Rotation from the deep hip',
+    pose: () => ({ legs: { t: 0.7, a: 0.05, f: 0.15, k: 0.3 }, pelvis: { x: -0.05 }, arms: { a: 0.3, e: 0.3 } }),
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Phrases: [move, beats]. Each begins and ends on "stand" (added by the player).
 // ---------------------------------------------------------------------------
@@ -504,6 +697,12 @@ export const PHRASES = {
   flyinglow: { steps: [['flLow', 0.9], ['flSpiralDown', 0.9], ['flRoll', 0.9], ['flPush', 0.8], ['flTravelL', 0.8], ['flTravelR', 0.8]] },
   gaga: { steps: [['ggFloat', 1.2], ['ggQuake', 1.2], ['ggWaveA', 0.8], ['ggWaveB', 0.8], ['ggExplode', 0.7], ['ggMelt', 1.2]] },
   countertechnique: { steps: [['ctScan', 1], ['ctSwing', 1], ['ctCounter', 1.1], ['ctBigOff', 1.1], ['lRebound', 0.9]] },
+  wigman: { steps: [['wTension', 1.2], ['wRelax', 1.2], ['wReach', 1], ['wTurnA', 0.9], ['wTurnB', 0.9], ['wWitch', 1.4]] },
+  humphrey: { steps: [['hwBreath', 1], ['lSwingDown', 1], ['lSwingUp', 1], ['lFall', 1.1], ['lRebound', 1], ['hwWaterCurl', 1.2], ['hwWaterRise', 1.2], ['hwPantomime', 1]] },
+  hawkins: { steps: [['hkSwing', 1], ['hkSwingBack', 1], ['hkPelvicWalk', 1.1], ['hkArc', 1.1], ['hkBalance', 1.2]] },
+  nikolais: { steps: [['nElbowLead', 1], ['nKneeLead', 1], ['nShape', 1], ['nExpand', 1], ['nContract', 1]] },
+  taylor: { steps: [['tTilt', 1], ['tRun', 0.7], ['cJete', 0.7], ['tFall', 1], ['tAureole', 1.1], ['spiralStand', 1]] },
+  klein: { steps: [['kFloor', 1.4], ['kAlign', 1], ['kRollDown', 1.4], ['kRotation', 1.1], ['rSwing', 1]] },
 };
 
 export function moveLabel(id) {

@@ -137,8 +137,8 @@ export function drawRadar(container, { values, mean, axes, color, size = 190 }) 
 export function drawLineage(container, { techniques, ancestors, onSelect }) {
   container.innerHTML = '';
   const W = 960;
-  const H = 440;
-  const m = { top: 30, right: 140, bottom: 40, left: 30 };
+  const H = 560;
+  const m = { top: 30, right: 150, bottom: 40, left: 30 };
 
   const nodes = [
     ...ancestors.map((a) => ({ ...a, ancestor: true })),
@@ -152,7 +152,7 @@ export function drawLineage(container, { techniques, ancestors, onSelect }) {
   // Lane layout: x is fixed by year. Each node tries to sit in its first
   // parent's lane, and otherwise takes the nearest lane whose last label has
   // already ended, so labels never overlap.
-  const LANES = 9;
+  const LANES = 12;
   const laneGap = (H - m.top - m.bottom) / (LANES - 1);
   const laneEnd = new Array(LANES).fill(-Infinity);
   const labelWidth = (d) => (d.name.length + 7) * 6.6 + 24;

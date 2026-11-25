@@ -1,6 +1,6 @@
 # One Body, Eight Numbers
 
-A scroll essay and interactive 3D map of contemporary dance techniques — Graham, Horton, Limón, Dunham, Cunningham, Butoh, Release, Contact Improvisation, Forsythe's Improvisation Technologies, Flying Low, Gaga and Countertechnique.
+A scroll essay and interactive 3D map of eighteen modern and contemporary dance techniques — Wigman, Graham, Humphrey–Weidman, Horton, Dunham, Limón, Hawkins, Cunningham, Nikolais/Louis, Taylor, Butoh, Release, Contact Improvisation, Klein, Forsythe's Improvisation Technologies, Flying Low, Gaga and Countertechnique — and the dancers who created them.
 
 Inspired by David Raup's 1966 shell morphospace: every technique is described by the same eight numbers, and a procedural 3D dancer moves according to those numbers.
 
@@ -10,7 +10,9 @@ Inspired by David Raup's 1966 shell morphospace: every technique is described by
 2. **Morphospace**: all techniques in 3D, placed by principal component analysis, with arrows showing each axis's pull.
 3. **Kinship**: similarity matrix; tap any pair to compare.
 4. **Lineage**: who learned from whom, over time.
-5. **Explorer**: set the eight sliders to invent a technique and find its nearest relatives.
+5. **Inside the studio**: meet each technique's founders (biography, training, core idea, students), walk through a typical class section by section with the skeleton demonstrating, and browse the signature steps, each with its own figure and explanation.
+6. **Explorer**: set the eight sliders to invent a technique and find its nearest relatives.
+7. **Recorded dancers**: motion-capture playback on the same skeleton.
 
 ## The eight axes
 
@@ -32,7 +34,8 @@ Scores are interpretive, not measured. Each technique carries a short `why` expl
 - **Skeleton:** real anatomical bone meshes from [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/) (229 bones: skull, vertebrae, ribs and cartilage, pelvis, limbs, hand and foot bones). Joint centres are measured from the bones themselves (e.g. the hip is the centre of the femoral head), so the rig has real human proportions.
 - **Choreographed phrases:** each technique dances its own class material (`src/phrases.js`): Graham seated breathings, spirals and pleadings; Horton flat back, lateral T, hinge and coccyx balance; Limón swings, suspension and falls; Dunham isolations and walks; Cunningham's five back positions with tendu and attitude; Butoh ganimata and slow walks; Release constructive rest and roll-ups; a Contact duet (lean, counterbalance, table); Forsythe's point–line, inscription and extrusion; Flying Low spirals and rolls; Gaga float, quake and waves; Countertechnique counter-directions.
 - **Recorded dancers:** five motion-capture recordings of modern dancers from the CMU database, played on the same skeleton (rotations only, so bones keep their proportions).
-- Add `?cam=side` to the URL to see the choreographed dancer in profile.
+- **Flexible rig:** 24 segments including a two-part thoracic spine, shoulder girdles with automatic shoulder-blade rhythm, curling fingers and toes that stay flat on half-toe. Sustained techniques flow through poses on a spline; percussive ones strike and hold.
+- **Free 3D view:** drag any figure to orbit 360°, right-drag to pan, Ctrl/⌘ + scroll or pinch to zoom, or use Front / Side / Back / Above. Add `?cam=side` to the URL to start in profile.
 
 ## Rebuilding the data
 

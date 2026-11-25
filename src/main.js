@@ -1,13 +1,15 @@
 import './style.css';
 import data from './data/techniques.json';
 import { toVector, similarityMatrix, pca, nearest, compareAxes } from './similarity.js';
-import { createFigureScene } from './figure.js';
+import { createFigureScene, renderPoseThumbnail } from './figure.js';
+import { MOVE_INFO } from './moveInfo.js';
 import { createMorphospace } from './morphospace.js';
 import { createMocapScene } from './mocap.js';
+import { registerPhrase, MOVES, PHRASES } from './phrases.js';
 import { drawHeatmap, drawLineage, drawRadar } from './charts.js';
 
 // ---------- Data prep ----------
-const PALETTE = ['#e0603a', '#e8a33d', '#c9c04a', '#7fb069', '#3fa7a0', '#4a90c9', '#7b6fd6', '#b65fc4', '#d4588f', '#a37b5c', '#8fa3b0', '#d98c6c'];
+const PALETTE = ['#e0603a', '#e8a33d', '#c9c04a', '#7fb069', '#3fa7a0', '#4a90c9', '#7b6fd6', '#b65fc4', '#d4588f', '#a37b5c', '#8fa3b0', '#d98c6c', '#5fb3d9', '#9c8f3a', '#c46b9e', '#4f9e7a', '#a65d4e', '#6c7fb8'];
 const axes = data.axes;
 const axisById = new Map(axes.map((a) => [a.id, a]));
 const techniques = data.techniques.map((t, i) => ({ ...t, color: PALETTE[i % PALETTE.length], vec: toVector(t.scores, axes) }));
@@ -80,7 +82,7 @@ function lerpParams(a, b, t) {
 }
 const smooth = (t) => t * t * (3 - 2 * t);
 
-const figure = createFigureScene($('#stage-figure'), { style: figStyle });
+const figure = createFigureScene($('#stage-figure'), { style: figStyle, scrollFriendly: true });
 figures.push(figure);
 figure.snap(resolvedSteps[0].frames[0]);
 let explorerFigure = null; // created further down, in the explorer section
@@ -271,7 +273,7 @@ const AXIS_INSIGHT = {
   contact: 'One technique, Contact Improvisation, pulls this axis wide on its own; for the rest, partnering is optional.',
   fall: 'Techniques disagree on whether balance is something to protect or something to give away.',
   floor: 'Floor use separates the newer, release-based forms from the standing, codified ones.',
-  initiation: 'Centre-led and limb-led techniques form clear camps, with Forsythe and Cunningham at the limb end.',
+  initiation: 'Centre-led and limb-led techniques form clear camps, with Forsythe, Nikolais and Cunningham at the limb end.',
   dynamics: 'Dynamics range from Butoh\'s near-stillness to Graham\'s strikes, but most techniques sit in the middle.',
   grounding: 'Most techniques lean grounded; only the ballet-influenced ones stay lifted.',
   torso: 'Almost every technique here frees the spine. That shared value is part of what makes them "modern" or "contemporary" rather than classical.',
@@ -353,7 +355,7 @@ async function fetchWiki(title) {
   }
 }
 
-// The axes on which a technique departs most from the average of all twelve.
+// The axes on which a technique departs most from the average of all eighteen.
 function signatureAxes(t, n = 3) {
   return axes
     .map((a, k) => ({ a, v: t.vec[k], d: t.vec[k] - meanVec[k], z: stdVec[k] ? (t.vec[k] - meanVec[k]) / stdVec[k] : 0 }))
@@ -374,6 +376,14 @@ function openTechnique(id) {
     <p class="founder">${t.founder}</p>
     <p class="lede">${t.summary}</p>
 
+    <h4>The people behind it</h4>
+    ${t.people
+      .map(
+        (pp) => `<div class="person-mini"><strong>${pp.name}</strong> <span class="muted">${[pp.life, pp.born].filter(Boolean).join(' · ')}</span><p>${pp.story}</p></div>`
+      )
+      .join('')}
+    <button class="btn ghost-btn" data-studio="${t.id}">Take the ${t.name} class ↓</button>
+
     <h4>History</h4>
     <p>${t.history}</p>
 
@@ -387,7 +397,7 @@ function openTechnique(id) {
     <ul class="principles">${t.exercises.map((p) => `<li>${p}</li>`).join('')}</ul>
 
     <h4>The eight numbers</h4>
-    <p class="muted small">Each dot is this technique's score; the tick is the average of all twelve.</p>
+    <p class="muted small">Each dot is this technique's score; the tick is the average of all eighteen.</p>
     <div class="scorebars">
       ${axes
         .map(
@@ -458,6 +468,12 @@ document.addEventListener('click', (e) => {
     setExplorer(byId.get(tryIt.dataset.try).scores);
     closeDrawer();
     $('#explore').scrollIntoView({ behavior: 'smooth' });
+  }
+  const toStudio = e.target.closest('[data-studio]');
+  if (toStudio) {
+    showStudio(toStudio.dataset.studio);
+    closeDrawer();
+    $('#studio').scrollIntoView({ behavior: 'smooth' });
   }
   // Links into the parameter section close the drawer so the target is visible.
   if (e.target.closest('#drawer a[href^="#axis-"]')) closeDrawer();
@@ -605,3 +621,143 @@ $('#mocap-speed').addEventListener('input', (e) => {
   $('#mocap-progress').style.width = `${mocap.progress() * 100}%`;
   requestAnimationFrame(mocapProgress);
 })();
+
+// ---------- Inside the studio: founders + class walkthrough ----------
+const studioFigure = createFigureScene($('#studio-figure'), { style: figStyle });
+figures.push(studioFigure);
+const renderStudioPhrase = phraseRenderer($('#studio-steps'));
+(function studioLoop() {
+  renderStudioPhrase(studioFigure.getStep());
+  requestAnimationFrame(studioLoop);
+})();
+
+const studioTabs = $('#studio-tabs');
+studioTabs.innerHTML = techniques
+  .map((t) => `<button role="tab" data-tab="${t.id}" style="--c:${t.color}"><span>${t.year}</span>${t.name}</button>`)
+  .join('');
+studioTabs.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-tab]');
+  if (b) showStudio(b.dataset.tab);
+});
+
+let studioId = null;
+function playSection(t, index) {
+  const sections = index === 'all' ? t.class : [t.class[index]];
+  const steps = sections.flatMap((sec) => sec.steps);
+  const partner = sections.every((sec) => sec.partner) ? sections.flatMap((sec) => sec.partner) : null;
+  const id = `class:${t.id}:${index}`;
+  registerPhrase(id, { steps, partner, duet: !!partner, fixed: true });
+  studioFigure.setTarget({ ...t.scores, contact: partner ? 1 : Math.min(t.scores.contact, 0.25) }, id);
+  document.querySelectorAll('#studio-sections li').forEach((li, i) => li.classList.toggle('is-active', index === 'all' || i === index));
+  document.querySelectorAll('#class-bar i').forEach((seg, i) => seg.classList.toggle('is-active', index === 'all' || i === index));
+  const sec = index === 'all' ? null : t.class[index];
+  $('#studio-now').innerHTML = sec
+    ? `<strong>${sec.name}</strong> · ${sec.minutes} min<br /><span class="muted">Watch for: ${sec.notice}</span>`
+    : `<strong>The whole class</strong> · ${t.class.reduce((a, c) => a + c.minutes, 0)} min, compressed into one phrase`;
+}
+
+function showStudio(id) {
+  const t = byId.get(id);
+  if (!t) return;
+  studioId = id;
+  studioTabs.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === id)));
+  studioTabs.querySelector(`[data-tab="${id}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  $('#studio-people').innerHTML = `
+    <p class="eyebrow" style="color:${t.color}">${t.year} · ${t.place}</p>
+    <h3>${t.name}</h3>
+    <p class="lede">${t.summary}</p>
+    ${t.people
+      .map(
+        (pp) => `
+      <article class="person">
+        <h4 class="person-name">${pp.name}</h4>
+        <p class="person-meta">${[pp.life, pp.born].filter(Boolean).join(' · ')}</p>
+        <p><strong>Training.</strong> ${pp.path}</p>
+        <p>${pp.story}</p>
+        <p class="belief"><span>Core idea</span>${pp.belief}</p>
+        ${pp.students.length ? `<p class="students"><span>Students &amp; dancers</span>${pp.students.join(' · ')}</p>` : ''}
+      </article>`
+      )
+      .join('')}
+    <button class="btn ghost-btn" data-open="${t.id}">Full technique card →</button>`;
+  const total = t.class.reduce((a, c) => a + c.minutes, 0);
+  $('#studio-minutes').textContent = `· about ${total} min`;
+  $('#class-bar').innerHTML = t.class
+    .map((c, i) => `<i style="flex:${c.minutes};--c:${t.color}" title="${c.name} · ${c.minutes} min" data-section="${i}"></i>`)
+    .join('');
+  $('#studio-sections').innerHTML = t.class
+    .map(
+      (c, i) => `<li data-section="${i}">
+        <button>
+          <span class="class-num">${i + 1}</span>
+          <span class="class-body"><strong>${c.name}</strong><span class="mono">${c.minutes} min</span>
+          <span class="class-desc">${c.desc}</span>
+          <span class="class-moves">${c.steps.map(([m]) => MOVES[m].label).filter((v, k, a) => a.indexOf(v) === k).join(' · ')}</span></span>
+        </button>
+      </li>`
+    )
+    .join('');
+  playSection(t, 0);
+  renderSignature(t);
+}
+
+// The pioneer's signature steps: one still figure and explanation per step.
+let sigToken = 0;
+async function renderSignature(t) {
+  const token = ++sigToken;
+  const def = PHRASES[t.id];
+  const ids = [...def.steps, ...(def.partner || [])].map(([m]) => m);
+  const seen = new Set();
+  const moves = ids.filter((m) => {
+    const label = MOVES[m].label;
+    if (seen.has(label) || !MOVE_INFO[m]) return false;
+    seen.add(label);
+    return true;
+  });
+  const founders = t.people.map((pp) => pp.name).join(' & ');
+  $('#sig-title').textContent = `Signature steps of ${t.name}, as taught by ${founders}`;
+  const grid = $('#sig-grid');
+  grid.innerHTML = moves
+    .map(
+      (m, i) => `<button class="sig-card" data-move="${m}" style="--c:${t.color}">
+        <span class="sig-fig"><img alt="Skeleton in the ${MOVES[m].label} position" /><span class="sig-num">${i + 1}</span></span>
+        <strong>${MOVES[m].label}</strong>
+        <span class="sig-how">${MOVE_INFO[m].how}</span>
+        <span class="sig-watch"><b>Watch:</b> ${MOVE_INFO[m].watch}</span>
+      </button>`
+    )
+    .join('');
+  // Render the figures one by one so the page stays responsive.
+  for (const m of moves) {
+    const url = await renderPoseThumbnail(m, t.scores, `${t.id}:${m}`).catch(() => null);
+    if (token !== sigToken) return;
+    const img = grid.querySelector(`[data-move="${m}"] img`);
+    if (img && url) img.src = url;
+  }
+}
+
+$('#sig-grid').addEventListener('click', (e) => {
+  const card = e.target.closest('[data-move]');
+  if (!card) return;
+  const t = byId.get(studioId);
+  const m = card.dataset.move;
+  const duet = t.id === 'contact';
+  const pair = { ciTable: 'ciOver', ciOver: 'ciTable' };
+  const id = `move:${t.id}:${m}`;
+  registerPhrase(id, { steps: [[m, 1.4]], partner: duet ? [[pair[m] || m, 1.4]] : null, duet, fixed: true });
+  studioFigure.setTarget({ ...t.scores, contact: duet ? 1 : Math.min(t.scores.contact, 0.25) }, id);
+  document.querySelectorAll('.sig-card').forEach((c) => c.classList.toggle('is-active', c === card));
+  document.querySelectorAll('#studio-sections li, #class-bar i').forEach((el) => el.classList.remove('is-active'));
+  $('#studio-now').innerHTML = `<strong>${MOVES[m].label}</strong><br /><span class="muted">${MOVE_INFO[m].how}</span>`;
+  $('#studio-figure').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+$('#studio-sections').addEventListener('click', (e) => {
+  const li = e.target.closest('[data-section]');
+  if (li) playSection(byId.get(studioId), +li.dataset.section);
+});
+$('#class-bar').addEventListener('click', (e) => {
+  const seg = e.target.closest('[data-section]');
+  if (seg) playSection(byId.get(studioId), +seg.dataset.section);
+});
+$('#studio-all').addEventListener('click', () => playSection(byId.get(studioId), 'all'));
+showStudio('graham');

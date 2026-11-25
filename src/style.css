@@ -360,3 +360,83 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .mocap-clips button span { font: 0.72rem var(--mono); color: var(--muted); white-space: nowrap; }
 .mocap-clips button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+/* ---------- 3D view controls ---------- */
+.stage-figure, .explore-figure, .mocap-canvas, .studio-figure { position: relative; }
+.view-ctrls {
+  position: absolute; right: 0.6rem; bottom: 0.6rem; z-index: 3; display: flex; flex-wrap: wrap; gap: 0.25rem; justify-content: flex-end;
+  max-width: calc(100% - 1.2rem);
+}
+.view-ctrls button {
+  background: color-mix(in srgb, var(--bg) 85%, transparent); border: 1px solid var(--line); border-radius: 999px;
+  padding: 0.22rem 0.6rem; font: 500 0.7rem var(--sans); color: var(--muted); backdrop-filter: blur(4px);
+}
+.view-ctrls button:hover { color: var(--ink); border-color: var(--ink); }
+.view-ctrls button[data-z], .view-ctrls button[data-v="reset"] { width: 1.9rem; padding: 0.22rem 0; font-size: 0.85rem; }
+.view-hint {
+  position: absolute; left: 0.8rem; top: 0.7rem; z-index: 2; margin: 0; max-width: 55%;
+  font: 0.65rem var(--mono); color: var(--muted); pointer-events: none; letter-spacing: 0.02em;
+}
+.stage-figure canvas, .explore-figure canvas, .studio-figure canvas { cursor: grab; }
+.stage-figure canvas:active, .explore-figure canvas:active, .studio-figure canvas:active { cursor: grabbing; }
+@media (max-width: 860px) { .view-hint { display: none; } }
+
+/* ---------- Inside the studio ---------- */
+.studio-tabs { display: flex; gap: 0.4rem; overflow-x: auto; padding: 0.2rem 0 1rem; scrollbar-width: thin; }
+.studio-tabs button {
+  flex: none; display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;
+  background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.45rem 0.8rem; font: 500 0.82rem var(--sans); text-align: left;
+}
+.studio-tabs button span { font: 0.65rem var(--mono); color: var(--muted); }
+.studio-tabs button[aria-selected="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); }
+.studio-grid { display: grid; grid-template-columns: minmax(15rem, 0.9fr) minmax(0, 1.4fr) minmax(15rem, 0.9fr); gap: 1.6rem; align-items: start; }
+@media (max-width: 1100px) { .studio-grid { grid-template-columns: 1fr 1fr; } .studio-stage { grid-column: 1 / -1; grid-row: 1; } }
+@media (max-width: 700px) { .studio-grid { grid-template-columns: 1fr; } }
+.studio-people h3 { font-size: 2rem; margin-bottom: 0.3rem; }
+.studio-people p { font-size: 0.88rem; line-height: 1.6; }
+.person { border-top: 1px solid var(--line); padding-top: 0.9rem; margin-top: 0.9rem; }
+.person-name { font: 400 1.35rem var(--serif); text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 0.2rem; }
+.person-meta { font: 0.72rem var(--mono) !important; color: var(--muted); margin: 0 0 0.6rem; }
+.belief, .students { display: grid; gap: 0.2rem; }
+.belief span, .students span { font: 600 0.65rem var(--sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.belief { font-family: var(--serif); font-size: 1.02rem !important; border-left: 2px solid var(--accent); padding-left: 0.8rem; }
+.ghost-btn { background: none; color: var(--ink); border: 1px solid var(--ink); margin-top: 0.6rem; }
+.studio-stage { position: sticky; top: 4.5rem; }
+.studio-figure { height: min(64vh, 600px); background: var(--surface); border-radius: 14px; overflow: hidden; }
+.studio-now { font-size: 0.88rem; margin: 0.8rem 0 0.4rem; line-height: 1.5; }
+.class-bar { display: flex; gap: 3px; height: 14px; margin: 0.4rem 0 1rem; }
+.class-bar i { display: block; background: color-mix(in srgb, var(--c) 35%, var(--line)); border-radius: 3px; cursor: pointer; transition: background 0.2s; }
+.class-bar i.is-active { background: var(--c); }
+.class-list { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: 0.4rem; }
+.class-list button {
+  display: flex; gap: 0.7rem; width: 100%; text-align: left; background: none;
+  border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.8rem;
+}
+.class-list li.is-active button { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.class-num { flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--line); color: var(--bg); font: 600 0.72rem var(--mono); }
+.class-list li.is-active .class-num { background: var(--accent); }
+.class-body { display: grid; gap: 0.15rem; font-size: 0.85rem; }
+.class-body strong { font-weight: 600; }
+.class-desc { color: var(--ink); line-height: 1.45; }
+.class-moves { font: 0.7rem var(--mono); color: var(--muted); }
+.person-mini { margin-bottom: 0.8rem; }
+.person-mini p { margin: 0.3rem 0 0; color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- Signature steps gallery ---------- */
+.signature { margin-top: 2.5rem; border-top: 1px solid var(--line); padding-top: 1.5rem; }
+.signature h3 { font-size: 1.6rem; margin-bottom: 0.3rem; }
+.sig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+.sig-card {
+  display: flex; flex-direction: column; gap: 0.35rem; text-align: left; padding: 0.7rem 0.7rem 0.9rem;
+  background: var(--surface); border: 1px solid transparent; border-radius: 14px; transition: border-color 0.2s, transform 0.2s;
+}
+.sig-card:hover { border-color: var(--c); transform: translateY(-2px); }
+.sig-card.is-active { border-color: var(--accent); }
+.sig-fig { position: relative; display: block; aspect-ratio: 240 / 280; background: var(--bg); border-radius: 10px; overflow: hidden; }
+.sig-fig img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.sig-fig img:not([src]) { visibility: hidden; }
+.sig-num { position: absolute; top: 0.4rem; left: 0.4rem; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--c); color: #111; font: 600 0.7rem var(--mono); }
+.sig-card strong { font-family: var(--serif); font-weight: 500; font-size: 1.1rem; margin-top: 0.2rem; }
+.sig-how { font-size: 0.82rem; line-height: 1.5; color: var(--ink); }
+.sig-watch { font-size: 0.78rem; line-height: 1.45; color: var(--muted); }
+.sig-watch b { font-weight: 600; color: var(--ink); }

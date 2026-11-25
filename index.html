@@ -30,6 +30,7 @@
         <a href="#profiles">Profiles</a>
         <a href="#kinship">Similarity</a>
         <a href="#lineage-sec">Lineage</a>
+        <a href="#studio">Studio</a>
         <a href="#explore">Explore</a>
         <a href="#recorded">Recorded</a>
         <button id="theme-toggle" class="ghost"></button>
@@ -131,7 +132,7 @@
       <header class="panel-head">
         <p class="eyebrow">10 · The parameters</p>
         <h2>Eight questions, in depth.</h2>
-        <p>The eight numbers are not arbitrary. Each one borrows from an established way of looking at movement: Rudolf Laban's Effort and space theory, Irmgard Bartenieff's body connectivities, and the principles the founders of these techniques wrote and taught themselves. For each parameter below you'll find what it measures, where the idea comes from, how to see it in a class, the scoring guide used to place each technique, and where all twelve techniques fall.</p>
+        <p>The eight numbers are not arbitrary. Each one borrows from an established way of looking at movement: Rudolf Laban's Effort and space theory, Irmgard Bartenieff's body connectivities, and the principles the founders of these techniques wrote and taught themselves. For each parameter below you'll find what it measures, where the idea comes from, how to see it in a class, the scoring guide used to place each technique, and where all eighteen techniques fall.</p>
         <p class="muted">Scores run from 0 to 1. They are informed judgements against the scoring guide, not laboratory measurements. Tap any technique to read why it got its number.</p>
       </header>
       <div id="axis-cards" class="axis-cards"></div>
@@ -141,7 +142,7 @@
     <section id="space" class="panel">
       <header class="panel-head">
         <p class="eyebrow">11 · The space</p>
-        <h2>Twelve techniques in one space.</h2>
+        <h2>Eighteen techniques in one space.</h2>
         <p>Each technique is a point with eight coordinates. Eight dimensions can't be drawn, so they are squeezed into three (principal component analysis). Those three keep <strong id="morph-variance-total"></strong> of the differences between techniques. Points that sit close together ask the body similar things. The grey arrows show which way each original number pulls.</p>
         <p class="muted mono" id="morph-variance"></p>
       </header>
@@ -156,7 +157,7 @@
       <header class="panel-head">
         <p class="eyebrow">12 · What tells them apart</p>
         <h2>Which numbers matter most.</h2>
-        <p>Not every parameter separates techniques equally. If all twelve agree on something, it can't tell them apart. The spread (standard deviation, σ) shows how much each parameter varies across techniques. Principal component analysis then finds the combined directions along which techniques differ most. These are the axes of the morphospace above.</p>
+        <p>Not every parameter separates techniques equally. If all eighteen agree on something, it can't tell them apart. The spread (standard deviation, σ) shows how much each parameter varies across techniques. Principal component analysis then finds the combined directions along which techniques differ most. These are the axes of the morphospace above.</p>
       </header>
       <div class="distinct-grid">
         <div>
@@ -170,7 +171,7 @@
         </div>
       </div>
       <h4 class="radars-title">Technique profiles</h4>
-      <p class="muted">Each shape plots one technique's eight numbers. The dashed outline is the average of all twelve, so you can see at a glance where a technique sticks out. Tap a profile for its full card.</p>
+      <p class="muted">Each shape plots one technique's eight numbers. The dashed outline is the average of all eighteen, so you can see at a glance where a technique sticks out. Tap a profile for its full card.</p>
       <div id="radars" class="radars"></div>
     </section>
 
@@ -192,15 +193,48 @@
       <header class="panel-head">
         <p class="eyebrow">14 · Lineage</p>
         <h2>Who learned from whom.</h2>
-        <p>Similarity and ancestry don't always match. Cunningham danced for Graham and then rejected most of what she taught. Gaga comes from a Graham-trained dancer, yet in the space it sits closer to Forsythe and Countertechnique than to Graham.</p>
+        <p>Similarity and ancestry don't always match. Cunningham danced for Graham and then rejected most of what she taught. Gaga comes from a Graham-trained dancer, yet in the space it sits closer to Nikolais and Forsythe than to Graham. And Butoh, from Japan, has a German grandparent: Kazuo Ohno's teachers learned from Mary Wigman's Ausdruckstanz.</p>
       </header>
       <div class="scroll-x"><div id="lineage" class="lineage"></div></div>
+    </section>
+
+    <!-- ============ Inside the studio ============ -->
+    <section id="studio" class="panel">
+      <header class="panel-head">
+        <p class="eyebrow">15 · Inside the studio</p>
+        <h2>Meet the founders. Take the class.</h2>
+        <p>Every technique began with a dancer who wanted the body to do something it hadn't been trained to do. Pick one to meet the people behind it and walk through a typical class, section by section. The skeleton demonstrates each part of the class; drag it to watch from any side, or switch to the body view.</p>
+      </header>
+      <div id="studio-tabs" class="studio-tabs" role="tablist" aria-label="Techniques"></div>
+      <div class="studio-grid">
+        <aside id="studio-people" class="studio-people"></aside>
+        <div class="studio-stage">
+          <div id="studio-figure" class="studio-figure">
+            <div class="style-toggle" role="group" aria-label="Figure style">
+              <button data-style="skeleton">Skeleton</button><button data-style="body">Body</button>
+            </div>
+          </div>
+          <p id="studio-now" class="studio-now"></p>
+          <ol id="studio-steps" class="phrase" aria-label="Steps being demonstrated"></ol>
+        </div>
+        <div class="studio-class">
+          <h4>A typical class <span id="studio-minutes" class="muted"></span></h4>
+          <div id="class-bar" class="class-bar" aria-hidden="true"></div>
+          <ol id="studio-sections" class="class-list"></ol>
+          <button id="studio-all" class="btn">Play the whole class</button>
+        </div>
+      </div>
+      <div class="signature">
+        <h3 id="sig-title"></h3>
+        <p class="muted">Each figure shows the shape of one step. Tap a step and the 3D skeleton above dances it.</p>
+        <div id="sig-grid" class="sig-grid"></div>
+      </div>
     </section>
 
     <!-- ============ Explorer ============ -->
     <section id="explore" class="panel explore">
       <header class="panel-head">
-        <p class="eyebrow">15 · Your turn</p>
+        <p class="eyebrow">16 · Your turn</p>
         <h2>Invent a technique.</h2>
         <p>Set the eight numbers, watch the figure dance them, and see which existing techniques yours is closest to. Your technique also shows up as a marker in the morphospace above.</p>
       </header>
@@ -230,7 +264,7 @@
     <!-- ============ Motion capture ============ -->
     <section id="recorded" class="panel">
       <header class="panel-head">
-        <p class="eyebrow">16 · Recorded dancers</p>
+        <p class="eyebrow">17 · Recorded dancers</p>
         <h2>The same skeleton, moved by a real dancer.</h2>
         <p>Everything above is choreographed from each technique's class material. These clips are different: they are motion-capture recordings of two dancers improvising modern-dance material, played back on the same anatomical skeleton. Only the recorded joint rotations are used, so the bones keep their real proportions. The recordings aren't labelled by technique, but they show what real weight shifts, turns and arm paths look like. Try them at quarter speed.</p>
       </header>

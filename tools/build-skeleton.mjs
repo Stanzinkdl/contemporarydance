@@ -30,29 +30,40 @@ await MeshoptSimplifier.ready;
 // 1. Classify bones into segments
 // ---------------------------------------------------------------------------
 // [segment, pattern, material]. Order matters: disks before vertebrae.
+// "spineT" and "rib" are split by level into the lower thorax (T7–T12) and the
+// upper chest (T1–T6), so the upper back can bend on its own.
 const RULES = [
   ['neck', /^intervertebral disk of (axis|(third|fourth|fifth|sixth|seventh) cervical vertebra)$/, 'cart'],
-  ['thorax', /^intervertebral disk of \w+ thoracic vertebra$/, 'cart'],
+  ['spineT', /^intervertebral disk of \w+ thoracic vertebra$/, 'cart'],
   ['lumbar', /^intervertebral disk of \w+ lumbar vertebra$/, 'cart'],
   ['head', /^(frontal bone|(left|right) parietal bone|occipital bone|(left|right) temporal bone|sphenoid bone|(left|right) maxilla|(left|right) zygomatic bone|(left|right) nasal bone|mandible|hyoid bone)$/],
   ['neck', /^(atlas|axis|(third|fourth|fifth|sixth|seventh) cervical vertebra)$/],
-  ['thorax', /(thoracic vertebra|^(left|right) \w+ rib|^body of sternum|^manubrium|^xiphoid process|clavicle|scapula)$/],
-  ['thorax', /costal cartilage$/, 'cart'],
+  ['spineT', /thoracic vertebra$/],
+  ['rib', /^(left|right) \w+ rib$/],
+  ['chest', /^(body of sternum|manubrium|xiphoid process)$/],
+  ['chest', /costal cartilage$/, 'cart'],
+  ['girdle', /(clavicle|scapula)$/],
   ['lumbar', /lumbar vertebra$/],
   ['pelvis', /(hip bone|^sacrum|coccyx)$/],
   ['upperArm', /humerus$/],
   ['foreArm', /(radius|ulna)$/],
-  ['hand', /(scaphoid|lunate|triquetral|pisiform|trapezium|trapezoid|capitate|hamate|metacarpal bone|phalanx of .*(thumb|finger))$/],
+  ['fingers', /phalanx of .*(thumb|finger)$/],
+  ['hand', /(scaphoid|lunate|triquetral|pisiform|trapezium|trapezoid|capitate|hamate|metacarpal bone)$/],
   ['thigh', /femur$/],
   ['shin', /(tibia|fibula|patella)$/],
-  ['foot', /(talus|calcaneus|navicular bone of (left|right) foot|cuneiform bone|cuboid bone|metatarsal bone|phalanx of .*toe)$/],
+  ['toes', /phalanx of .*toe$/],
+  ['foot', /(talus|calcaneus|navicular bone of (left|right) foot|cuneiform bone|cuboid bone|metatarsal bone)$/],
 ];
-const SIDED = new Set(['upperArm', 'foreArm', 'hand', 'thigh', 'shin', 'foot']);
+const SIDED = new Set(['girdle', 'upperArm', 'foreArm', 'hand', 'fingers', 'thigh', 'shin', 'foot', 'toes']);
+const ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth'];
+const level = (n) => ORD.indexOf((n.match(new RegExp(`\\b(${ORD.join('|')})\\b`)) || [])[1]) + 1;
 
 function classify(name) {
   const n = name.toLowerCase();
   for (const [seg, re, mat = 'bone'] of RULES) {
     if (!re.test(n)) continue;
+    if (seg === 'spineT') return { seg: level(n) <= (mat === 'cart' ? 5 : 6) ? 'chest' : 'thorax', mat };
+    if (seg === 'rib') return { seg: level(n) <= 6 ? 'chest' : 'thorax', mat };
     if (!SIDED.has(seg)) return { seg, mat };
     if (/\bleft\b/.test(n)) return { seg: seg + 'L', mat };
     if (/\bright\b/.test(n)) return { seg: seg + 'R', mat };
@@ -112,6 +123,7 @@ const top = (P, t) => { const m = maxY(P); return P.filter((p) => p[1] > m - t);
 const bottom = (P, t) => { const m = minY(P); return P.filter((p) => p[1] < m + t); };
 const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 // Centre of a ball-shaped joint head: the medial-most cap of the bone's top.
 function headCentre(P, depth, radius) {
   const cap = top(P, depth);
@@ -130,12 +142,29 @@ for (const [s, side] of [['L', 'left'], ['R', 'right']]) {
   J[`shoulder${s}`] = headCentre(humerus, 0.05, 0.022);
   J[`elbow${s}`] = centroid(bottom(humerus, 0.03));
   J[`wrist${s}`] = centroid(pts(`${side} lunate`, `${side} scaphoid`, `${side} capitate`));
-  J[`handTip${s}`] = centroid(pts(`proximal phalanx of ${side} middle finger`));
-  J[`toe${s}`] = centroid(pts(`proximal phalanx of ${side} second toe`));
+  // Knuckles and the balls of the feet: the ends of the proximal phalanges
+  // nearest the wrist / ankle.
+  const nearEnd = (names, to) => {
+    const out = [];
+    for (const nm of names) {
+      const P = pts(nm).sort((a, b) => dist(a, to) - dist(b, to));
+      out.push(...P.slice(0, Math.ceil(P.length * 0.15)));
+    }
+    return centroid(out);
+  };
+  J[`mcp${s}`] = nearEnd(['index', 'middle', 'ring', 'little'].map((f) => `proximal phalanx of ${side} ${f} finger`), J[`wrist${s}`]);
+  J[`fingerTip${s}`] = centroid(pts(`distal phalanx of ${side} middle finger`));
+  J[`mtp${s}`] = nearEnd(['big', 'second', 'third', 'fourth', 'little'].map((f) => `proximal phalanx of ${side} ${f} toe`), J[`ankle${s}`]);
+  J[`toeTip${s}`] = centroid(pts(`distal phalanx of ${side} second toe`));
+  // Sternoclavicular joint: the medial end of the collarbone.
+  const clav = pts(`${side} clavicle`);
+  const m = Math.min(...clav.map((p) => Math.abs(p[0])));
+  J[`sc${s}`] = centroid(clav.filter((p) => Math.abs(p[0]) < m + 0.015));
 }
 J.lumbosacral = centroid(pts('intervertebral disk of fifth lumbar vertebra'));
 J.thoracolumbar = mid(centroid(pts('intervertebral disk of eleventh thoracic vertebra')), centroid(pts('intervertebral disk of first lumbar vertebra')));
 J.cervicothoracic = centroid(pts('intervertebral disk of seventh cervical vertebra'));
+J.chestJoint = centroid(pts('intervertebral disk of sixth thoracic vertebra'));
 J.atlanto = (([x, y, z]) => [x, y + 0.01, z])(centroid(pts('atlas')));
 J.skullTop = [0, maxY(pts('frontal bone', 'left parietal bone', 'right parietal bone')), 0];
 J.midHip = mid(J.hipL, J.hipR);
@@ -151,18 +180,22 @@ console.log('height (m):', J.skullTop[1].toFixed(3));
 const SEGMENTS = {
   pelvis: ['midHip', 'lumbosacral'],
   lumbar: ['lumbosacral', 'thoracolumbar'],
-  thorax: ['thoracolumbar', 'cervicothoracic'],
+  thorax: ['thoracolumbar', 'chestJoint'],
+  chest: ['chestJoint', 'cervicothoracic'],
   neck: ['cervicothoracic', 'atlanto'],
   head: ['atlanto', 'skullTop'],
 };
 for (const s of ['L', 'R']) {
   Object.assign(SEGMENTS, {
+    [`girdle${s}`]: [`sc${s}`, `shoulder${s}`],
     [`upperArm${s}`]: [`shoulder${s}`, `elbow${s}`],
     [`foreArm${s}`]: [`elbow${s}`, `wrist${s}`],
-    [`hand${s}`]: [`wrist${s}`, `handTip${s}`],
+    [`hand${s}`]: [`wrist${s}`, `mcp${s}`],
+    [`fingers${s}`]: [`mcp${s}`, `fingerTip${s}`],
     [`thigh${s}`]: [`hip${s}`, `knee${s}`],
     [`shin${s}`]: [`knee${s}`, `ankle${s}`],
-    [`foot${s}`]: [`ankle${s}`, `toe${s}`],
+    [`foot${s}`]: [`ankle${s}`, `mtp${s}`],
+    [`toes${s}`]: [`mtp${s}`, `toeTip${s}`],
   });
 }
 
