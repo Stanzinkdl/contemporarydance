@@ -661,7 +661,9 @@ function showStudio(id) {
   if (!t) return;
   studioId = id;
   studioTabs.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === id)));
-  studioTabs.querySelector(`[data-tab="${id}"]`)?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  // Scroll only the tab row (not the page) so the selected technique is visible.
+  const tab = studioTabs.querySelector(`[data-tab="${id}"]`);
+  if (tab) studioTabs.scrollTo({ left: tab.offsetLeft - (studioTabs.clientWidth - tab.offsetWidth) / 2, behavior: 'smooth' });
   $('#studio-people').innerHTML = `
     <p class="eyebrow" style="color:${t.color}">${t.year} · ${t.place}</p>
     <h3>${t.name}</h3>
