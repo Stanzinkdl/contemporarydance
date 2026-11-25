@@ -1,13 +1,101 @@
 {
   "axes": [
-    { "id": "grounding",  "label": "Weight",      "low": "lifted",        "high": "grounded",         "desc": "Where the body's weight lives: pulled up and away from the floor, or yielded into it." },
-    { "id": "torso",      "label": "Torso",       "low": "vertical, held", "high": "curved, spiralling", "desc": "How much the spine bends, contracts and twists instead of staying a vertical column." },
-    { "id": "dynamics",   "label": "Dynamics",    "low": "sustained",     "high": "percussive",       "desc": "The energy shape of a phrase: smooth and continuous, or sharp attacks and stops." },
-    { "id": "floor",      "label": "Floor",       "low": "upright",       "high": "floor-based",      "desc": "How much of the technique happens on, into and through the floor." },
-    { "id": "initiation", "label": "Initiation",  "low": "periphery",     "high": "centre",           "desc": "Where movement starts: hands, feet and points in space, or the pelvis, breath and centre." },
-    { "id": "structure",  "label": "Structure",   "low": "improvised",    "high": "codified",         "desc": "A fixed vocabulary taught as set exercises, or tasks and principles you improvise from." },
-    { "id": "fall",       "label": "Balance",     "low": "held",          "high": "fall & recovery",  "desc": "Whether balance is something to keep, or something to give up and catch again." },
-    { "id": "contact",    "label": "Contact",     "low": "solo",          "high": "shared weight",    "desc": "How much the practice depends on touching, leaning on and carrying another body." }
+    {
+      "id": "grounding", "label": "Weight", "low": "lifted", "high": "grounded",
+      "desc": "Where the body's weight lives: pulled up and away from the floor, or yielded into it.",
+      "roots": ["Laban: Weight Effort", "Bartenieff: yield & push", "Ballet 'pull-up'"],
+      "theory": "Every technique takes a stance on gravity. Classical ballet and the techniques that borrow its legs train a 'pull-up': the centre of mass held high, knees straight, the dancer appearing to rise away from the floor. Grounded techniques do the opposite. The knees soften, the pelvis drops, and the dancer learns to yield weight into the floor so they can push off it. Irmgard Bartenieff called this 'yield and push': you can only push away from a surface you have first given weight to. Many African-diasporic forms, Butoh's bent-legged ganimata stance and most release-based work sit at the grounded end. The axis is not about strength. A grounded dancer can be very light on their feet, but the reference point is down, not up.",
+      "rubric": {
+        "0": "Centre of mass held high; straight standing legs; relevé and balances are the norm.",
+        "0.5": "Neutral stance; pliés used as preparation rather than as a home position.",
+        "1": "Knees habitually bent, pelvis low, weight visibly poured into the feet and floor."
+      },
+      "watch": "Watch the knees and the height of the pelvis between movements. Do they return to straight, or stay soft?"
+    },
+    {
+      "id": "torso", "label": "Torso", "low": "vertical, held", "high": "curved, spiralling",
+      "desc": "How much the spine bends, contracts and twists instead of staying a vertical column.",
+      "roots": ["Graham: contraction & spiral", "Cunningham: five back positions", "Bartenieff: head–tail connectivity"],
+      "theory": "Ballet keeps the torso largely vertical and quiet so the legs and arms can be read clearly. Modern dance began by setting the spine free. Martha Graham made the torso the source of expression. Her contraction hollows the body from the pelvis on an exhale, and her spiral rotates the torso around the vertical axis. Merce Cunningham taught five positions of the back: upright, curve, arch, tilt and twist. Horton favours long flat backs and lateral tilts, which are articulate but planar rather than curved. Gaga and Dunham work with fluid, undulating or isolating spines. A high score means the spine itself is a main moving part, bending in several directions, not just a support for the limbs.",
+      "rubric": {
+        "0": "Spine kept vertical and still; expression comes from the limbs.",
+        "0.5": "Spine tilts or flat-backs in clear planes, but curves and twists are occasional.",
+        "1": "Contraction, arch, spiral and undulation are central to the vocabulary."
+      },
+      "watch": "Follow the line from the tailbone to the head. Does it stay straight, or does it curve and twist?"
+    },
+    {
+      "id": "dynamics", "label": "Dynamics", "low": "sustained", "high": "percussive",
+      "desc": "The energy shape of a phrase: smooth and continuous, or sharp attacks and stops.",
+      "roots": ["Laban: Time Effort (sudden ↔ sustained)", "Laban: Flow Effort", "Humphrey: suspension"],
+      "theory": "Rudolf Laban described the quality of movement through four Effort factors. Two matter most here: Time (sudden versus sustained) and Flow (bound versus free). A sustained phrase spreads its energy evenly, so motion never quite stops. A percussive phrase concentrates energy into accents: a quick attack, then a held shape or a rebound. Graham's contractions are strikes from the pelvis. Dunham's isolations play several rhythms against one another (polyrhythm). Butoh can slow movement almost to stillness. Doris Humphrey's 'suspension', the moment a body hangs at the top of an arc before falling, sits between the two: a held breath inside a continuous flow. In the animated figure, this axis sets transition speed and how long each step holds.",
+      "rubric": {
+        "0": "Continuous, slow, unaccented flow; stillness and slowness are valued.",
+        "0.5": "A mix of accents and flow; phrasing follows breath or music.",
+        "1": "Sharp attacks, stops, rhythmic accents and fast changes dominate."
+      },
+      "watch": "Look at how a movement starts and ends. Does it melt in and out, or click into place?"
+    },
+    {
+      "id": "floor", "label": "Floor", "low": "upright", "high": "floor-based",
+      "desc": "How much of the technique happens on, into and through the floor.",
+      "roots": ["Graham floor series", "Release: constructive rest", "Flying Low / Contact: rolling, sliding"],
+      "theory": "Ballet treats the floor as a surface to push away from. Early modern dance brought dancers down to it. Graham's class begins seated on the floor with bounces, breathings and spirals, and Horton and Limón teach falls to the ground. But in those techniques the floor is mostly a place to practise or a destination. In later forms it becomes a partner. Release classes often start lying in constructive rest, using the floor to release tension. Contact Improvisation rolls across it continuously. David Zambrano's Flying Low is designed for travelling at speed in and out of the floor, with spirals that pass the body through low levels without stopping. A high score means time spent near the ground and smooth passage between levels, not just going down and getting up.",
+      "rubric": {
+        "0": "Almost everything happens standing; going to the floor is rare.",
+        "0.5": "Floor work as a warm-up section or in set falls.",
+        "1": "Continuous travel through low levels; the floor is part of nearly every phrase."
+      },
+      "watch": "Count how much time the dancer spends below standing height, and how smoothly they pass through it."
+    },
+    {
+      "id": "initiation", "label": "Initiation", "low": "periphery", "high": "centre",
+      "desc": "Where movement starts: hands, feet and points in space, or the pelvis, breath and centre.",
+      "roots": ["Bartenieff: core–distal connectivity", "Laban: kinesphere", "Sequential vs. simultaneous movement"],
+      "theory": "Any movement starts somewhere. In centre-initiated techniques the impulse begins in the pelvis, the belly or the breath and travels outward through the spine to the limbs, as a ripple (sequential or 'successional' movement). Graham's contraction starts in the pelvis, Limón phrases begin on the breath, and Flying Low organises spirals around the centre. In periphery-initiated work, the hands, feet or head lead and the rest of the body follows. William Forsythe's Improvisation Technologies are the clearest case: the dancer imagines points, lines and planes in Laban's kinesphere (the sphere of space within reach) and moves the limbs to draw, touch or extrude them. Bartenieff's core–distal connectivity describes the link between the two: in an integrated mover, energy passes both ways between centre and extremities.",
+      "rubric": {
+        "0": "Limbs lead; spatial targets (points, lines) organise the movement.",
+        "0.5": "Both are used; initiation depends on the exercise.",
+        "1": "Movement is consistently driven from the pelvis, breath or centre."
+      },
+      "watch": "Watch the first quarter-second of a movement: which body part moves before the others?"
+    },
+    {
+      "id": "structure", "label": "Structure", "low": "improvised", "high": "codified",
+      "desc": "A fixed vocabulary taught as set exercises, or tasks and principles you improvise from.",
+      "roots": ["Codified syllabi (Graham, Horton, Dunham)", "Judson Dance Theater: tasks & scores", "Improvisation as practice"],
+      "theory": "Codified techniques are passed on as a syllabus: named exercises in a fixed order, practised daily until the vocabulary becomes second nature. Graham, Horton, Limón, Dunham and Cunningham classes look recognisably similar anywhere in the world. From the 1960s the Judson Dance Theater group in New York challenged this, building dances from tasks, rules and everyday movement. Their descendants teach principles instead of steps. Contact Improvisation has no set vocabulary at all, only physical skills and a shared attention. Gaga is taught entirely through spoken images, without mirrors. Forsythe's technologies are rules for generating movement. Countertechnique sits in the middle: a structured class whose aim is to give dancers tools rather than fixed shapes. The scale says nothing about rigour: improvised forms train skills as demanding as any syllabus.",
+      "rubric": {
+        "0": "No fixed vocabulary; tasks, images or scores generate the movement each time.",
+        "0.5": "A structured class built around principles; exercises vary.",
+        "1": "Named, fixed exercises in a set order, the same from class to class."
+      },
+      "watch": "Ask whether two classes on different days would contain the same exercises."
+    },
+    {
+      "id": "fall", "label": "Balance", "low": "held", "high": "fall & recovery",
+      "desc": "Whether balance is something to keep, or something to give up and catch again.",
+      "roots": ["Humphrey: 'the arc between two deaths'", "Limón: fall, rebound, suspension", "Countertechnique: counter-directions"],
+      "theory": "Doris Humphrey described dance as 'the arc between two deaths': standing in perfect balance and lying motionless on the floor. Life, and dance, happen in between, in the risk of falling and recovering. Her student José Limón built a technique around falling, rebounding and suspending. Cunningham and ballet value secure, held balance, even in fast changes of direction. Contact Improvisation trains falling as a basic skill. Countertechnique sends body parts in opposite directions so dancers can go far off balance without strain. A high score means the technique deliberately leaves the vertical and treats the recovery as part of the movement, not a correction.",
+      "rubric": {
+        "0": "Balance is held and controlled; going off-axis is avoided or brief.",
+        "0.5": "Off-balance tilts and falls appear as specific exercises.",
+        "1": "Falling, catching and rebounding run through the whole vocabulary."
+      },
+      "watch": "Does the body ever lean past the point where it would have to step or fall to recover?"
+    },
+    {
+      "id": "contact", "label": "Contact", "low": "solo", "high": "shared weight",
+      "desc": "How much the practice depends on touching, leaning on and carrying another body.",
+      "roots": ["Contact Improvisation: point of contact", "Partnering traditions", "Group improvisation"],
+      "theory": "Most dance techniques are trained solo, facing a mirror or the front of the room. Partnering, if taught, is a separate skill: ballet's pas de deux puts it in a different class. Contact Improvisation reversed this in 1972. Its basic unit is two bodies sharing a moving point of contact, giving and taking weight, rolling over and lifting one another without fixed roles. Release work and Flying Low often include group and partner exercises, but these extend solo training rather than define it. This axis measures how essential another body is to the practice.",
+      "rubric": {
+        "0": "Trained alone; partnering is absent or a separate discipline.",
+        "0.5": "Regular partner or group work inside class.",
+        "1": "The practice cannot exist without shared weight and touch."
+      },
+      "watch": "Could you practise this technique alone in a room? How much would be lost?"
+    }
   ],
 
   "techniques": [
@@ -15,96 +103,360 @@
       "id": "graham", "name": "Graham", "founder": "Martha Graham", "year": 1926, "place": "New York",
       "wiki": "Graham technique",
       "parents": ["denishawn"],
-      "principles": ["Contraction and release", "Spiral of the torso", "Floor work as a warm-up sequence", "Movement driven from the pelvis"],
+      "summary": "The first codified modern dance technique: dramatic, percussive and built on the contraction and release of the torso.",
+      "history": "Martha Graham trained and performed with Denishawn, Ruth St. Denis and Ted Shawn's company, before leaving in 1923 to find a movement language of her own. She founded her school and company in New York in 1926 and developed the technique through the 1930s, working closely with her mentor, the composer Louis Horst. She wanted movement that showed inner, emotional life rather than decoration. Her vocabulary of contraction, spiral and fall became the first widely taught alternative to ballet, and generations of modern dancers trained in it, including Merce Cunningham, Paul Taylor and Ohad Naharin.",
+      "principles": ["Contraction and release", "Spiral of the torso around the spine", "Floor work as the opening of class", "Movement driven from the pelvis", "Breath as the motor of movement"],
+      "concepts": [
+        { "term": "Contraction", "desc": "An exhale that hollows the torso from the pelvis upward, curving the spine. Percussive and emotionally charged." },
+        { "term": "Release", "desc": "The inhale that returns the spine to length and verticality, often lifting the chest." },
+        { "term": "Spiral", "desc": "Rotation of the torso around the spine, starting from the pelvis, with the back carried higher than the front." },
+        { "term": "Pleadings", "desc": "Exercises of contraction and release on the knees with the arms reaching." }
+      ],
+      "exercises": ["Bounces, breathings and spirals seated on the floor", "Pleadings and exercises on the knees", "Standing contractions and pliés", "Falls: back fall, side fall", "Triplets and progressions across the floor"],
+      "works": ["Lamentation (1930)", "Primitive Mysteries (1931)", "Appalachian Spring (1944)", "Night Journey (1947)"],
+      "legacy": "Still taught worldwide; it set the template for later codified modern techniques.",
+      "distinct": "Graham combines the strongest torso articulation in the set with a strictly codified class and percussive dynamics. The spine does the expressive work, but always inside fixed forms. Dunham is close on rhythm and grounding; Release shares the curved spine but not the structure.",
       "scores": { "grounding": 0.70, "torso": 0.92, "dynamics": 0.80, "floor": 0.60, "initiation": 0.95, "structure": 0.95, "fall": 0.45, "contact": 0.05 },
+      "notes": {
+        "grounding": "Strong use of plié and the floor, but standing work still lifts through the back.",
+        "torso": "The contraction and spiral make the spine the main expressive instrument.",
+        "dynamics": "Contractions are sharp strikes from the pelvis; phrasing is dramatic and accented.",
+        "floor": "Class opens seated on the floor, and set falls are central, but most dancing is upright.",
+        "initiation": "Nearly every movement starts in the pelvis and breath.",
+        "structure": "A fixed syllabus taught in a set order.",
+        "fall": "Graham falls are trained, but as controlled descents rather than off-balance risk.",
+        "contact": "A solo training; partnering appears only in repertoire."
+      },
       "why": "The contraction is a sharp, pelvis-driven curve of the spine, practised as a fixed class order that starts seated on the floor."
     },
     {
       "id": "horton", "name": "Horton", "founder": "Lester Horton", "year": 1938, "place": "Los Angeles",
       "wiki": "Lester Horton",
       "parents": [],
-      "principles": ["Flat backs and lateral stretches", "Long lines through the whole body", "Studies built for strength and flexibility", "Hinges and fortifications"],
+      "summary": "An anatomically based technique of long lines, flat backs and lateral stretches, known for building strength and flexibility.",
+      "history": "Lester Horton developed his technique in Los Angeles in the 1930s and 1940s, outside the New York modern dance scene. He drew on his interest in Native American dance, as well as Japanese and other theatre forms, and he ran one of the first racially integrated dance companies in the United States. His students included Alvin Ailey, Carmen de Lavallade and James Truitte. After Horton's death in 1953 his students preserved and codified the technique. It is still a core of training at the Ailey School.",
+      "principles": ["Flat backs and lateral stretches", "Long lines through the whole body", "Studies that build strength and flexibility", "Hinges and deep lunges", "Correcting anatomical faults"],
+      "concepts": [
+        { "term": "Fortifications", "desc": "Exercises designed to strengthen specific parts of the body, numbered and practised in sequence." },
+        { "term": "Lateral T", "desc": "The body tilted sideways from the hip, with the torso and one leg forming a straight horizontal line." },
+        { "term": "Hinge", "desc": "Leaning back in a straight line from the knees, with the body as a single plank." },
+        { "term": "Studies", "desc": "Longer set combinations, such as dimensional tonus, that put the fortifications together." }
+      ],
+      "exercises": ["Flat backs (forward and lateral)", "Primitive squat", "Deep lunges", "Hinges", "Coccyx balance", "Lateral T"],
+      "works": ["Salome (1937 and later versions)", "The Beloved (1948)"],
+      "legacy": "The basis of training at the Alvin Ailey American Dance Theater.",
+      "distinct": "Horton is codified like Graham, but its torso works in straight planes rather than curves: flat back, lateral T, hinge. It is the most geometric of the codified modern techniques, which places it near Cunningham and Countertechnique in the space.",
       "scores": { "grounding": 0.55, "torso": 0.50, "dynamics": 0.50, "floor": 0.30, "initiation": 0.45, "structure": 0.95, "fall": 0.40, "contact": 0.05 },
+      "notes": {
+        "grounding": "Deep lunges and squats sit alongside long, lifted lines; neither dominates.",
+        "torso": "Very articulate, but mostly in straight planes (flat back, tilt) rather than curves.",
+        "dynamics": "Controlled and even, with accents built into the studies.",
+        "floor": "Some floor work, but most exercises are standing.",
+        "initiation": "Line and shape matter as much as the centre; the whole limb moves as one.",
+        "structure": "Numbered fortifications and studies form a strict syllabus.",
+        "fall": "Hinges and tilts go off the vertical under control rather than as true falls.",
+        "contact": "Solo training."
+      },
       "why": "A strongly codified anatomical system; the torso works in straight planes (flat back, lateral T) more than curves."
     },
     {
       "id": "limon", "name": "Limón", "founder": "José Limón (after Doris Humphrey)", "year": 1946, "place": "New York",
       "wiki": "José Limón",
       "parents": ["humphrey"],
-      "principles": ["Fall and recovery", "Suspension and rebound", "Breath as phrasing", "Successional movement through the body"],
+      "summary": "A technique of weight, breath and gravity: falling, rebounding and suspending.",
+      "history": "Doris Humphrey left Denishawn with Charles Weidman in 1928 and developed a theory of movement built on fall and recovery. José Limón, born in Mexico, danced with Humphrey–Weidman and then founded his own company in 1946 with Humphrey as artistic director. The Limón technique grew from Humphrey's principles and Limón's own humanist, dramatic choreography. It focuses on the natural rhythm of breath, the weight of body parts, and the moment of suspension before a fall.",
+      "principles": ["Fall and recovery", "Suspension and rebound", "Breath as phrasing", "Successional movement through the body", "Opposition and isolation"],
+      "concepts": [
+        { "term": "Fall and recovery", "desc": "Giving in to gravity and recovering from it; Humphrey's core idea." },
+        { "term": "Suspension", "desc": "The moment of hang at the top of an arc, before gravity takes over again." },
+        { "term": "Rebound", "desc": "The elastic recovery that comes out of a fall, using momentum rather than muscle alone." },
+        { "term": "Weight", "desc": "Feeling and using the actual weight of the head, arms and torso as they drop and swing." }
+      ],
+      "exercises": ["Swings of the torso and arms", "Head and torso drops with rebound", "Falls to the floor and recovery", "Successional arm and spine work", "Across-the-floor phrases built on suspension"],
+      "works": ["The Moor's Pavane (1949)", "There Is a Time (1956)", "Missa Brevis (1958)"],
+      "legacy": "Its focus on weight and breath prepared the ground for release-based work.",
+      "distinct": "Limón has the highest fall score in the set. It is codified and breath-driven like Graham, but its subject is gravity rather than the torso's emotional shape. That puts it next to Release and Countertechnique, which make falling into a principle.",
       "scores": { "grounding": 0.75, "torso": 0.70, "dynamics": 0.40, "floor": 0.40, "initiation": 0.70, "structure": 0.75, "fall": 0.95, "contact": 0.15 },
+      "notes": {
+        "grounding": "Weight is felt and given into the floor; the dancer works with gravity, not against it.",
+        "torso": "The spine drops, swings and curves successionally.",
+        "dynamics": "Phrasing follows the breath, alternating suspension and release.",
+        "floor": "Falls to the floor are trained, and recovery from the ground is part of the vocabulary.",
+        "initiation": "Breath and the drop of weight start most movement.",
+        "structure": "A recognisable class structure, but less rigid than Graham or Horton.",
+        "fall": "The core of the technique: fall, rebound, suspension.",
+        "contact": "Mostly solo, with some partnering in repertoire."
+      },
       "why": "Built on Humphrey's 'arc between two deaths': giving in to gravity and suspending out of it, on the breath."
     },
     {
       "id": "dunham", "name": "Dunham", "founder": "Katherine Dunham", "year": 1945, "place": "Chicago / New York",
       "wiki": "Katherine Dunham",
       "parents": [],
-      "principles": ["Isolations of hips, ribs and shoulders", "Polyrhythm in the body", "Undulating spine", "Afro-Caribbean roots with ballet and modern training"],
+      "summary": "A synthesis of Afro-Caribbean dance, ballet and modern dance, built on isolations and polyrhythm.",
+      "history": "Katherine Dunham trained as an anthropologist at the University of Chicago and did fieldwork on dance in Haiti, Jamaica, Martinique and Trinidad in 1935–36. She brought what she learned into her choreography and teaching, combining African-diasporic movement with ballet and modern dance. Her Dunham School of Dance and Theatre opened in New York in 1945 and trained dancers, actors and musicians. She saw dance as part of culture and community, not only as stage art.",
+      "principles": ["Isolations of the hips, ribs and shoulders", "Polyrhythm in the body", "An undulating, articulate spine", "Grounded stance and rhythmic connection to drums", "Dance as cultural knowledge"],
+      "concepts": [
+        { "term": "Isolations", "desc": "Moving one part of the body (head, shoulders, ribs, hips) independently of the others." },
+        { "term": "Polyrhythm", "desc": "Different body parts keeping different rhythms at once, as in many West African and Caribbean dances." },
+        { "term": "Progressions", "desc": "Set combinations travelling across the floor, building in complexity." },
+        { "term": "Form and function", "desc": "Dunham's idea that movement makes sense in the context of its cultural purpose." }
+      ],
+      "exercises": ["Barre work combining ballet and isolations", "Isolations of head, shoulders, ribs and pelvis", "Progressions across the floor", "Rhythmic walks and turns to live drumming"],
+      "works": ["L'Ag'Ya (1938)", "Rites de Passage (1941)", "Shango (1945)"],
+      "legacy": "A major influence on jazz dance, African-American concert dance and dance anthropology.",
+      "distinct": "Dunham is grounded, centre-driven and percussive like Graham, which is why they sit close together. The difference lies in rhythm and isolation: the hips, ribs and shoulders move independently in layered rhythms, where Graham moves the torso as one unit.",
       "scores": { "grounding": 0.80, "torso": 0.80, "dynamics": 0.70, "floor": 0.20, "initiation": 0.80, "structure": 0.85, "fall": 0.20, "contact": 0.10 },
+      "notes": {
+        "grounding": "A low, bent-kneed stance connected to the earth and the drum.",
+        "torso": "Isolations and undulations make the torso highly articulate.",
+        "dynamics": "Rhythmic and accented, often with polyrhythm.",
+        "floor": "Danced mostly upright and travelling.",
+        "initiation": "Pelvis and ribs drive much of the movement.",
+        "structure": "A set barre and progressions, taught as a system.",
+        "fall": "Balance is mostly held; the emphasis is rhythm, not falling.",
+        "contact": "Solo and ensemble rather than partnered weight-sharing."
+      },
       "why": "Grounded, pelvis-centred and rhythmic, with an articulate, isolating torso taught through set progressions."
     },
     {
       "id": "cunningham", "name": "Cunningham", "founder": "Merce Cunningham", "year": 1953, "place": "New York",
       "wiki": "Cunningham technique",
       "parents": ["graham", "ballet"],
-      "principles": ["Curve, arch, tilt and twist of the upper back", "Ballet-derived legs and speed", "Changes of direction", "Movement free of narrative"],
+      "summary": "A fast, precise technique combining ballet legs with a highly mobile back, designed for constant changes of direction.",
+      "history": "Merce Cunningham danced as a soloist in Martha Graham's company from 1939 to 1945, then broke away to make work free of narrative and emotional drama. He formed his company in 1953 at Black Mountain College and collaborated for decades with the composer John Cage. They used chance procedures to decide the order and timing of movement, and made music and dance independently. His technique had to prepare dancers for anything: sudden changes of direction, speed and complex coordination of legs and back.",
+      "principles": ["Curve, arch, tilt and twist of the upper back", "Ballet-derived legs, feet and speed", "Changes of direction and front", "Rhythmic precision without depending on the music", "Movement with no story"],
+      "concepts": [
+        { "term": "Five back positions", "desc": "Upright, curve, arch, tilt and twist: the back's vocabulary, combined with the legs." },
+        { "term": "Chance procedures", "desc": "Using dice, coins or the I Ching to decide sequence, timing or space. This is a choreographic method, not part of the class." },
+        { "term": "Independence of music and dance", "desc": "Music and dance share a time frame but are made separately." },
+        { "term": "Decentralised space", "desc": "No single front; every point on stage can matter equally." }
+      ],
+      "exercises": ["Bounces and back exercises in the centre", "Tendu, dégagé and leg work at speed", "Tilts with leg extensions", "Fast across-the-floor phrases with changes of direction", "Long adagios testing balance"],
+      "works": ["Suite for Five (1956)", "Summerspace (1958)", "RainForest (1968)", "Biped (1999)"],
+      "legacy": "Influenced postmodern dance via his students and Judson, and made chance a choreographic tool.",
+      "distinct": "Cunningham is the most upright technique here, joint most lifted with Forsythe, and has the most securely held balance. Its back is very mobile but organised in clear named shapes, and its legs come from ballet. It sits near Horton and Forsythe: geometric, upright, and led from the periphery as much as from the centre.",
       "scores": { "grounding": 0.30, "torso": 0.55, "dynamics": 0.60, "floor": 0.10, "initiation": 0.30, "structure": 0.90, "fall": 0.10, "contact": 0.05 },
+      "notes": {
+        "grounding": "Ballet pull-up in the legs; weight carried high for speed.",
+        "torso": "The upper back curves, arches, tilts and twists, but in clear, named positions.",
+        "dynamics": "Quick, precise and often unpredictable in rhythm.",
+        "floor": "Almost entirely upright.",
+        "initiation": "Legs and back are coordinated as separate parts; little sense of a pelvic source.",
+        "structure": "A set class; chance belongs to choreography, not training.",
+        "fall": "Balance is controlled and held, even in fast direction changes.",
+        "contact": "Solo training."
+      },
       "why": "Upright and quick on ballet legs; the back bends in five set directions while balance stays sharply controlled."
     },
     {
       "id": "butoh", "name": "Butoh", "founder": "Tatsumi Hijikata & Kazuo Ohno", "year": 1959, "place": "Tokyo",
       "wiki": "Butoh",
       "parents": ["ausdruckstanz"],
-      "principles": ["Extreme slowness", "Image-driven transformation", "Low, bent-legged stance", "The body being moved rather than moving"],
+      "summary": "A Japanese avant-garde dance form of extreme slowness and transformation, driven by images rather than steps.",
+      "history": "Butoh emerged in post-war Japan. Tatsumi Hijikata's Kinjiki (Forbidden Colours, 1959) is often named as its starting point, and Hijikata called his work ankoku butoh, 'dance of darkness'. Kazuo Ohno, who had studied with teachers trained in German Ausdruckstanz, became its other founding figure. His Admiring La Argentina (1977) is a landmark. Butoh rejected both Western dance and Japanese classical forms and looked for the body's hidden, raw and transformed states. Companies such as Sankai Juku later took it worldwide, often with shaved heads and white body paint.",
+      "principles": ["Extreme slowness and control", "Image-driven transformation (becoming something else)", "Low, bent-legged stance", "The body being moved rather than moving", "Facing darkness, death and the grotesque"],
+      "concepts": [
+        { "term": "Ankoku butoh", "desc": "'Dance of darkness': Hijikata's name for the form, rejecting beauty and virtuosity." },
+        { "term": "Butoh-fu", "desc": "Hijikata's notation of images (for example, insects crawling on the skin) that the dancer embodies." },
+        { "term": "Ganimata", "desc": "A low, bow-legged stance with the knees bent and turned out, the weight sunk." },
+        { "term": "Being danced", "desc": "Letting images or forces move the body instead of willing a movement." }
+      ],
+      "exercises": ["Very slow walking (for example, as if on a thin line)", "Image work: transforming into an animal, plant or object", "Holding positions in stillness", "Facial and hand transformations"],
+      "works": ["Kinjiki (Hijikata, 1959)", "Admiring La Argentina (Ohno, 1977)", "Kinkan Shonen (Sankai Juku, 1978)"],
+      "legacy": "Spread internationally from the 1980s and influenced physical theatre and contemporary dance.",
+      "distinct": "Butoh is the most sustained technique in the set and among the most grounded. Its nearest neighbour is Release: both are low, slow, image-led and loosely structured. It differs in purpose: Release seeks ease and efficiency, while Butoh seeks transformation and strangeness.",
       "scores": { "grounding": 0.90, "torso": 0.70, "dynamics": 0.10, "floor": 0.50, "initiation": 0.70, "structure": 0.30, "fall": 0.30, "contact": 0.05 },
+      "notes": {
+        "grounding": "The low, sunk ganimata stance keeps weight deep in the legs.",
+        "torso": "The spine distorts, curves and collapses as images transform it.",
+        "dynamics": "Extreme slowness; the most sustained form here.",
+        "floor": "Crawling, lying and low levels are common, alongside standing work.",
+        "initiation": "Movement comes from inner images and the centre rather than from the limbs.",
+        "structure": "Images and states rather than a step syllabus.",
+        "fall": "Collapses and descents occur, but slowly and under control.",
+        "contact": "Mainly solo."
+      },
       "why": "Deeply grounded and almost continuously slow; worked through images rather than a fixed step vocabulary."
     },
     {
       "id": "release", "name": "Release Technique", "founder": "Joan Skinner, Mary Fulkerson and others", "year": 1970, "place": "USA / UK",
       "wiki": "Release technique",
       "parents": ["ideokinesis", "judson"],
-      "principles": ["Skeletal alignment over muscular holding", "Imagery (ideokinesis)", "Efficiency and ease", "Using momentum and gravity"],
+      "summary": "A family of approaches that replace muscular holding with skeletal alignment, imagery and the efficient use of gravity and momentum.",
+      "history": "Release is less a single technique than a family. It goes back to Mabel Todd's The Thinking Body (1937) and Lulu Sweigard's ideokinesis, which used mental images to improve alignment. In the 1960s and 1970s, teachers including Joan Skinner (Skinner Releasing Technique) in the US and Mary Fulkerson at Dartington College in the UK built dance classes on these ideas. The postmodern choreographers around Judson, Trisha Brown above all, made release-based movement the look of a generation. Today 'release' describes much of contemporary dance training in Europe and beyond.",
+      "principles": ["Skeletal alignment over muscular holding", "Imagery (ideokinesis)", "Efficiency and ease", "Using momentum and gravity", "Breath and the floor as resources"],
+      "concepts": [
+        { "term": "Ideokinesis", "desc": "Using precise mental images of the skeleton and movement to change habits without forcing." },
+        { "term": "Constructive rest", "desc": "Lying on the back with knees bent, letting the floor support the body while imagining release." },
+        { "term": "Momentum", "desc": "Letting a swing or drop carry the body instead of starting every movement with fresh effort." },
+        { "term": "Skeletal support", "desc": "Finding support through the bones rather than tensed muscles." }
+      ],
+      "exercises": ["Constructive rest and floor-based imagery", "Rolling and spiralling on the floor", "Swings and drops using momentum", "Partner touch to direct attention", "Improvised phrases from images"],
+      "works": ["Trisha Brown: Set and Reset (1983)", "Trisha Brown: Watermotor (1978)"],
+      "legacy": "Shaped much European contemporary training and many somatic practices.",
+      "distinct": "After Countertechnique, Release is the technique closest to the average profile. It is moderately grounded, curved, floor-friendly and loosely structured, and it is one of the most sustained techniques. Its closest neighbour is Butoh, through slowness and imagery, followed by Countertechnique and Limón. Its defining number is low effort: dynamics at 0.2.",
       "scores": { "grounding": 0.70, "torso": 0.70, "dynamics": 0.20, "floor": 0.55, "initiation": 0.60, "structure": 0.35, "fall": 0.60, "contact": 0.20 },
+      "notes": {
+        "grounding": "Weight is released into the floor and bones rather than held up.",
+        "torso": "A free, mobile spine, often spiralling and curving.",
+        "dynamics": "Ease and momentum; effort is minimised.",
+        "floor": "Much of class happens lying, rolling and passing through low levels.",
+        "initiation": "Starts from the skeleton and centre, though imagery can lead from anywhere.",
+        "structure": "Principles and images rather than set steps.",
+        "fall": "Uses gravity and drops, going off balance easily.",
+        "contact": "Touch and partner work are often used as teaching tools."
+      },
       "why": "Lets go of held tension and trusts weight and momentum; taught through images and principles more than set steps."
     },
     {
-      "id": "contact", "name": "Contact Improvisation", "founder": "Steve Paxton", "year": 1972, "place": "New York",
+      "id": "contact", "name": "Contact Improvisation", "founder": "Steve Paxton (with Nancy Stark Smith and others)", "year": 1972, "place": "New York",
       "wiki": "Contact improvisation",
       "parents": ["judson", "cunningham"],
-      "principles": ["A shared point of contact", "Giving and taking weight", "Rolling, falling and lifting", "The small dance of standing"],
+      "summary": "An improvised duet form in which dancers share a moving point of contact, giving and taking weight.",
+      "history": "Steve Paxton danced with Merce Cunningham and was a founding member of Judson Dance Theater. In January 1972 he made Magnesium with students at Oberlin College, a piece of falling, colliding and rolling. Later that year he and others, including Nancy Stark Smith, performed what they called Contact Improvisation in New York. The form spread quickly through 'jams': open sessions where anyone can dance. Paxton drew on aikido and his own research into reflexes and the 'small dance', the tiny balancing movements of a body standing still.",
+      "principles": ["A shared point of contact", "Giving and taking weight", "Rolling, falling and lifting", "The 'small dance' of standing", "Following the momentum of the duet"],
+      "concepts": [
+        { "term": "Point of contact", "desc": "The place where two bodies touch. It rolls across the bodies and leads the dance." },
+        { "term": "Small dance", "desc": "Standing still and noticing the tiny reflexive movements that keep the body upright." },
+        { "term": "Jam", "desc": "An open improvisation session, the main social setting of the form." },
+        { "term": "Spherical space", "desc": "Being able to move in any direction, including upside down, without losing orientation." }
+      ],
+      "exercises": ["The small dance (standing meditation)", "Rolling point of contact with a partner", "Back-to-back weight sharing", "Falling and rolling skills", "Table, lifts and riding momentum"],
+      "works": ["Magnesium (1972)", "Fall After Newton (video, 1987)"],
+      "legacy": "Practised in jams worldwide; it reshaped partnering in contemporary dance.",
+      "distinct": "Contact is the outlier on contact (1.0) and among the least structured. Without that one axis it would sit beside Release, its close relative. With it, it stands apart from every other technique: no other form makes another body essential.",
       "scores": { "grounding": 0.70, "torso": 0.60, "dynamics": 0.30, "floor": 0.60, "initiation": 0.60, "structure": 0.10, "fall": 0.75, "contact": 1.00 },
+      "notes": {
+        "grounding": "Weight flows down into the floor and into the partner.",
+        "torso": "The back is a large, rolling surface for contact; the spine stays responsive.",
+        "dynamics": "Continuous flow, following momentum, with occasional sudden falls.",
+        "floor": "Rolling and returning to the floor are constant.",
+        "initiation": "The point of contact and the centre lead, more than the hands.",
+        "structure": "Fully improvised; skills are trained, but no vocabulary is set.",
+        "fall": "Falling and being caught are basic skills.",
+        "contact": "The defining feature: impossible without another body."
+      },
       "why": "An improvised duet form whose whole subject is the moving point of contact and shared weight."
     },
     {
       "id": "forsythe", "name": "Improvisation Technologies", "founder": "William Forsythe", "year": 1994, "place": "Frankfurt",
       "wiki": "William Forsythe (choreographer)",
       "parents": ["ballet"],
-      "principles": ["Points, lines and planes in space", "Inscribing and extruding shapes", "Ballet geometry taken apart", "Rules for improvising"],
+      "summary": "A set of rules for generating movement from imagined points, lines and planes, developed from ballet geometry.",
+      "history": "William Forsythe directed Ballett Frankfurt from 1984 to 2004 and took classical ballet apart from the inside. To help his dancers improvise, he developed operations on the lines and shapes of the body and the space around it, building on Rudolf Laban's idea of the kinesphere. In 1994 he recorded lectures on these operations, published in 1999 by ZKM Karlsruhe as the CD-ROM Improvisation Technologies: A Tool for the Analytical Dance Eye. It became a widely used teaching resource.",
+      "principles": ["Points, lines and planes in space", "Inscribing and extruding shapes", "Ballet geometry taken apart", "Rules for improvising", "Multiple simultaneous centres"],
+      "concepts": [
+        { "term": "Point–point–line", "desc": "Imagining a line between two points on the body or in space, then moving it." },
+        { "term": "Inscription", "desc": "Drawing a shape in space with any body part." },
+        { "term": "Extrusion", "desc": "Pushing a line or shape out along a direction, as if stretching it into space." },
+        { "term": "Dropping curves", "desc": "Letting an imagined curve fall through the body, which follows it." }
+      ],
+      "exercises": ["Drawing lines between points of the body", "Inscribing shapes with elbows, knees, head", "Rotating imagined planes", "Combining several operations at once"],
+      "works": ["Artifact (1984)", "In the Middle, Somewhat Elevated (1987)", "One Flat Thing, reproduced (2000)"],
+      "legacy": "Changed how ballet dancers improvise and how dancers think about space and geometry.",
+      "distinct": "Forsythe's technologies are the most peripheral (initiation 0.2): the limbs lead by drawing in space. They share an upright, lifted base with Cunningham and an improvisational structure with Gaga. The spine is mobile, but geometry rather than sensation organises it.",
       "scores": { "grounding": 0.30, "torso": 0.70, "dynamics": 0.60, "floor": 0.20, "initiation": 0.20, "structure": 0.40, "fall": 0.50, "contact": 0.05 },
+      "notes": {
+        "grounding": "Built on a ballet body: lifted, with quick footwork.",
+        "torso": "Off-centre torsos, tilts and twists arise as the body follows lines.",
+        "dynamics": "Can be very fast and articulated, often with sudden shifts.",
+        "floor": "Mostly upright.",
+        "initiation": "Imagined points and lines around the body lead the movement.",
+        "structure": "Clear rules, but the movement itself is improvised.",
+        "fall": "Off-balance, off-centre shapes are common; Forsythe pushes ballet off its axis.",
+        "contact": "Solo practice."
+      },
       "why": "Movement starts from imagined points and lines around the body, then is improvised with clear operations."
     },
     {
       "id": "flyinglow", "name": "Flying Low", "founder": "David Zambrano", "year": 1995, "place": "Amsterdam / Brussels",
       "wiki": null,
       "parents": ["release", "contact"],
-      "principles": ["Spiralling in and out of the floor", "Moving fast close to the ground", "Breath and centre", "Moving with the group's energy"],
+      "summary": "A technique for moving quickly in and out of the floor in spirals, organised around the relationship between centre and periphery.",
+      "history": "The Venezuelan dancer and teacher David Zambrano developed Flying Low in the 1990s while working mainly in Europe. He drew on release work, Contact Improvisation and his background in social dance. The technique trains dancers to travel efficiently close to the ground, using breath and spiralling paths so that going down and coming up flow continuously. Zambrano also created Passing Through, an improvisation method about moving through a group. Both are widely taught in European contemporary dance schools and festivals.",
+      "principles": ["Spiralling in and out of the floor", "Moving fast close to the ground", "Breath and centre", "Relationship between centre and periphery", "Moving with the group's energy"],
+      "concepts": [
+        { "term": "Centre and periphery", "desc": "Keeping a clear relation between the body's centre and its extremities, especially at speed." },
+        { "term": "Spirals", "desc": "Paths that carry the body down to and up from the floor without stopping." },
+        { "term": "Breath", "desc": "Exhaling to go down, using breath to drive speed and release." },
+        { "term": "Passing Through", "desc": "Zambrano's related group improvisation practice of moving through and with others." }
+      ],
+      "exercises": ["Low spirals in and out of the floor", "Travelling sequences across the room at low level", "Hands and feet supporting quick transfers", "Group pathways moving through space together"],
+      "works": ["Taught mainly as a practice rather than through repertoire"],
+      "legacy": "Common in European contemporary training; known for athletic, low-level speed.",
+      "distinct": "Flying Low has the highest floor score (0.9) and is among the most grounded. Unlike Release and Butoh, which also go low, it is fast and dynamic. That combination of very low and very fast is what defines it.",
       "scores": { "grounding": 0.90, "torso": 0.70, "dynamics": 0.70, "floor": 0.90, "initiation": 0.85, "structure": 0.45, "fall": 0.70, "contact": 0.20 },
+      "notes": {
+        "grounding": "Weight is very low, with deep knees and a low centre.",
+        "torso": "Spirals drive the paths to and from the floor.",
+        "dynamics": "Fast, energetic and athletic, with quick shifts.",
+        "floor": "The defining feature: constant passage through low levels.",
+        "initiation": "Organised from the centre and breath.",
+        "structure": "Set sequences and principles mixed with improvisation.",
+        "fall": "The body constantly drops and recovers through the floor.",
+        "contact": "Group awareness and some partner work, but not shared weight."
+      },
       "why": "Very low, very fast travel in and out of the floor, organised from the centre in spirals."
     },
     {
       "id": "gaga", "name": "Gaga", "founder": "Ohad Naharin", "year": 1999, "place": "Tel Aviv",
       "wiki": "Ohad Naharin",
       "parents": ["graham"],
-      "principles": ["Listening to sensation", "Floating and 'boiling' textures", "Explosive power from ease", "No mirrors; improvised from instructions"],
+      "summary": "A movement language taught through spoken images, focused on sensation, effort and pleasure, practised without mirrors.",
+      "history": "Ohad Naharin danced with the Martha Graham Dance Company before founding his own and becoming artistic director of Batsheva Dance Company in Tel Aviv in 1990. He developed Gaga over the following years, first as training for Batsheva dancers. It later opened to the public as Gaga/people, with classes for non-dancers alongside Gaga/dancers. A teacher speaks images and instructions while everyone moves at once. There are no mirrors and no demonstrations to copy. The 2015 documentary Mr. Gaga brought it to a wide audience.",
+      "principles": ["Listening to sensation", "Floating and 'boiling' textures", "Explosive power from ease", "No mirrors; improvised from instructions", "Connecting effort and pleasure"],
+      "concepts": [
+        { "term": "Float", "desc": "A sense of the body being carried, with minimal effort, often the base layer of class." },
+        { "term": "Quake / shake", "desc": "Fast, small vibrations through the body that release tension and wake up sensation." },
+        { "term": "Layers", "desc": "Adding instructions one on top of another, so the body carries many tasks at once." },
+        { "term": "Explosive power", "desc": "Sudden bursts of speed and force that come out of softness rather than tension." }
+      ],
+      "exercises": ["Continuous movement for the whole class, never stopping", "Floating and shaking textures", "Layering images: textures, speeds, body parts", "Exploring extremes of effort, from minimal to explosive"],
+      "works": ["Minus 16 (1999)", "Decadance (2000)", "Mr. Gaga (documentary, 2015)"],
+      "legacy": "Taught internationally to dancers and the public; reshaped Batsheva's style.",
+      "distinct": "Gaga comes from a Graham dancer, yet it lands closer to Forsythe and Countertechnique. It keeps Graham's mobile spine but drops the codified structure and the pelvic origin. Its strongest numbers are a very articulate torso (0.85) with low structure (0.2).",
       "scores": { "grounding": 0.50, "torso": 0.85, "dynamics": 0.60, "floor": 0.20, "initiation": 0.60, "structure": 0.20, "fall": 0.40, "contact": 0.05 },
+      "notes": {
+        "grounding": "Neither lifted nor sunk; the stance changes with the image.",
+        "torso": "A very fluid spine: undulating, shaking, curving.",
+        "dynamics": "A wide range, from floating to explosive.",
+        "floor": "Mostly standing; floor work is occasional.",
+        "initiation": "Sensation can start anywhere; often centre and spine.",
+        "structure": "Spoken images and tasks; no fixed steps.",
+        "fall": "Some off-balance play, but not a focus.",
+        "contact": "Dancers move together in a room but rarely touch."
+      },
       "why": "Improvised from spoken images, with a very fluid, articulate spine and a wide dynamic range."
     },
     {
       "id": "countertechnique", "name": "Countertechnique", "founder": "Anouk van Dijk", "year": 2003, "place": "Amsterdam",
       "wiki": "Anouk van Dijk",
       "parents": ["release"],
-      "principles": ["Sending body parts in opposite directions", "Less tension, more space", "Scanning the body", "Big off-balance movement without strain"],
+      "summary": "A structured class and set of tools that use counter-directions to let dancers move big and off balance with less strain.",
+      "history": "The Dutch choreographer Anouk van Dijk developed Countertechnique from the 1990s with her company in Amsterdam, and formalised it as a teachable system in the 2000s. She later directed Chunky Move in Melbourne. The technique responds to the demands of contemporary choreography: big, fast, off-balance movement. It aims to make that movement possible without overworking the body. Dancers learn to send body parts in opposite directions so that the body stays spacious and supported while it moves to extremes.",
+      "principles": ["Sending body parts in opposite directions", "Less tension, more space", "Scanning the body", "Big off-balance movement without strain", "A dancer who thinks while moving"],
+      "concepts": [
+        { "term": "Directions and counter-directions", "desc": "For every direction one part moves in, another part goes the opposite way." },
+        { "term": "Scanning", "desc": "Briefly checking through the body during movement to release unnecessary tension." },
+        { "term": "Off-balance with ease", "desc": "Using counter-directions to stay supported in extreme positions." },
+        { "term": "Toolbox", "desc": "Principles the dancer applies to any choreography, rather than a style of its own." }
+      ],
+      "exercises": ["Standing exercises built around counter-directions", "Weight shifts and swings", "Large off-balance phrases", "Combinations that test the tools at speed"],
+      "works": ["Anouk van Dijk: Trust (2011)", "Taught widely in European conservatoires"],
+      "legacy": "Used as a training method in many European and Australian schools.",
+      "distinct": "Countertechnique is the technique closest to the average of all twelve. Its neighbours are Horton, Limón and Forsythe. It has a structured class like Horton, a willingness to go off balance like Limón, and release roots. Its strongest feature is an above-average fall score (0.65) paired with a fairly structured class (0.6).",
       "scores": { "grounding": 0.55, "torso": 0.60, "dynamics": 0.50, "floor": 0.30, "initiation": 0.50, "structure": 0.60, "fall": 0.65, "contact": 0.05 },
+      "notes": {
+        "grounding": "Balanced between lift and drop; counter-directions keep the body spacious.",
+        "torso": "Mobile, but organised by opposing directions rather than curving for its own sake.",
+        "dynamics": "Wide range, depending on the phrase.",
+        "floor": "Some floor work, but mostly standing and travelling.",
+        "initiation": "Directions are sent out from the centre and in from the periphery.",
+        "structure": "A structured class with tools rather than fixed shapes.",
+        "fall": "Designed to make big off-balance movement safe.",
+        "contact": "Solo training."
+      },
       "why": "A set class with clear tools that uses counter-directions to go off balance safely."
     }
   ],

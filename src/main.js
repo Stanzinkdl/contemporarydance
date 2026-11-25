@@ -3,21 +3,47 @@ import data from './data/techniques.json';
 import { toVector, similarityMatrix, pca, nearest, compareAxes } from './similarity.js';
 import { createFigureScene } from './figure.js';
 import { createMorphospace } from './morphospace.js';
-import { drawHeatmap, drawLineage } from './charts.js';
+import { drawHeatmap, drawLineage, drawRadar } from './charts.js';
 
 // ---------- Data prep ----------
 const PALETTE = ['#e0603a', '#e8a33d', '#c9c04a', '#7fb069', '#3fa7a0', '#4a90c9', '#7b6fd6', '#b65fc4', '#d4588f', '#a37b5c', '#8fa3b0', '#d98c6c'];
 const axes = data.axes;
+const axisById = new Map(axes.map((a) => [a.id, a]));
 const techniques = data.techniques.map((t, i) => ({ ...t, color: PALETTE[i % PALETTE.length], vec: toVector(t.scores, axes) }));
 const byId = new Map(techniques.map((t) => [t.id, t]));
 const vectors = techniques.map((t) => t.vec);
 const simMatrix = similarityMatrix(vectors);
 const pcaResult = pca(vectors, 3);
 const pcOrder = techniques.map((_, i) => i).sort((a, b) => pcaResult.points[a][0] - pcaResult.points[b][0]);
+const meanVec = axes.map((_, k) => vectors.reduce((s, v) => s + v[k], 0) / vectors.length);
+const stdVec = axes.map((_, k) => Math.sqrt(vectors.reduce((s, v) => s + (v[k] - meanVec[k]) ** 2, 0) / vectors.length));
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const fmt = (x) => x.toFixed(2);
 const pct = (x) => `${Math.round(x * 100)}%`;
+const chip = (t) => `<button class="tchip" data-open="${t.id}" style="--c:${t.color}">${t.name}</button>`;
+
+// ---------- Figure style (skeleton / body) ----------
+let figStyle = 'skeleton';
+try {
+  const s = localStorage.getItem('dance-figure');
+  if (s === 'skeleton' || s === 'body') figStyle = s;
+} catch {}
+const figures = [];
+function syncStyleButtons() {
+  document.querySelectorAll('[data-style]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.style === figStyle)));
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-style]');
+  if (!b) return;
+  figStyle = b.dataset.style;
+  try {
+    localStorage.setItem('dance-figure', figStyle);
+  } catch {}
+  figures.forEach((f) => f.setStyle(figStyle));
+  syncStyleButtons();
+});
+syncStyleButtons();
 
 // ---------- Scroll essay ----------
 // Each step lists keyframes. A keyframe is a technique id, or a technique id
@@ -52,10 +78,10 @@ function lerpParams(a, b, t) {
 }
 const smooth = (t) => t * t * (3 - 2 * t);
 
-const stage = $('#stage-figure');
-const figure = createFigureScene(stage);
-let explorerFigure = null; // created further down, in the explorer section
+const figure = createFigureScene($('#stage-figure'), { style: figStyle });
+figures.push(figure);
 figure.snap(resolvedSteps[0].frames[0]);
+let explorerFigure = null; // created further down, in the explorer section
 
 const stepEls = [...document.querySelectorAll('.step')];
 const navDots = $('#step-nav');
@@ -67,14 +93,19 @@ stepEls.forEach((el, i) => {
   navDots.appendChild(b);
 });
 
-// Fill in each step's caption: the focused axis and the values it moves through.
+// Fill in each step's caption and a link to that parameter's theory.
 stepEls.forEach((el, i) => {
   const step = resolvedSteps[i];
   const cap = el.querySelector('.step-values');
   if (!cap || !step.focus) return;
-  const ax = axes.find((a) => a.id === step.focus);
+  const ax = axisById.get(step.focus);
   const vals = step.frames.map((f) => fmt(f[step.focus]));
   cap.textContent = `${ax.label.toUpperCase()}  ${vals.join(' → ')}   ·   ${ax.low} ↔ ${ax.high}`;
+  const more = document.createElement('a');
+  more.className = 'step-more';
+  more.href = `#axis-${ax.id}`;
+  more.textContent = `The theory of ${ax.label.toLowerCase()} →`;
+  cap.after(more);
 });
 
 let activeStep = -1;
@@ -133,6 +164,7 @@ function buildHud(container) {
     });
 }
 const updateHud = buildHud($('#hud'));
+
 // The phrase as a row of numbered step chips; the current step is lit.
 function phraseRenderer(el) {
   let sig = '';
@@ -167,6 +199,137 @@ const nearestLabel = $('#stage-nearest');
   requestAnimationFrame(hudLoop);
 })();
 
+// ---------- The eight parameters, in depth ----------
+// Dots that share nearly the same value stack upward so none hide each other.
+function stackDots(items, gap = 0.04) {
+  const levels = [];
+  return items
+    .slice()
+    .sort((a, b) => a.v - b.v)
+    .map((it) => {
+      let lvl = 0;
+      while ((levels[lvl] ?? -Infinity) > it.v - gap) lvl++;
+      levels[lvl] = it.v;
+      return { ...it, lvl };
+    });
+}
+
+function renderAxisCards() {
+  $('#axis-cards').innerHTML = axes
+    .map((a, k) => {
+      const items = techniques.map((t) => ({ t, v: t.vec[k] }));
+      const dots = stackDots(items);
+      const maxLvl = Math.max(...dots.map((d) => d.lvl));
+      const ranked = [...items].sort((x, y) => y.v - x.v);
+      return `
+      <article class="axis-card" id="axis-${a.id}">
+        <header class="axis-head">
+          <span class="axis-num">${String(k + 1).padStart(2, '0')}</span>
+          <div>
+            <h3>${a.label}</h3>
+            <p class="axis-range"><span>0 · ${a.low}</span><span>1 · ${a.high}</span></p>
+          </div>
+        </header>
+        <div class="axis-body">
+          <div class="axis-text">
+            <p class="axis-desc">${a.desc}</p>
+            <p>${a.theory}</p>
+            <ul class="roots">${a.roots.map((r) => `<li>${r}</li>`).join('')}</ul>
+            <p class="watch"><strong>How to see it:</strong> ${a.watch}</p>
+          </div>
+          <div class="axis-data">
+            <h4>Where the techniques fall</h4>
+            <div class="strip" style="--levels:${maxLvl + 1}">
+              <div class="strip-track"><i style="left:${pct(meanVec[k])}" class="strip-mean" title="Average ${fmt(meanVec[k])}"></i></div>
+              ${dots
+                .map(
+                  (d) =>
+                    `<button class="strip-dot" data-open="${d.t.id}" style="left:${pct(d.v)};bottom:${d.lvl * 16 + 14}px;--c:${d.t.color}" title="${d.t.name}: ${fmt(d.v)}"></button>`
+                )
+                .join('')}
+            </div>
+            <div class="strip-ends"><span>${a.low}</span><span class="muted">avg ${fmt(meanVec[k])}</span><span>${a.high}</span></div>
+            <ol class="ranked">${ranked.map((d) => `<li>${chip(d.t)}<span>${fmt(d.v)}</span></li>`).join('')}</ol>
+            <h4>Scoring guide</h4>
+            <dl class="rubric">${Object.entries(a.rubric)
+              .sort((x, y) => +x[0] - +y[0]) // JS orders "0" and "1" before "0.5"
+              .map(([v, txt]) => `<dt>${v}</dt><dd>${txt}</dd>`)
+              .join('')}</dl>
+          </div>
+        </div>
+      </article>`;
+    })
+    .join('');
+}
+renderAxisCards();
+
+// ---------- What tells them apart ----------
+const AXIS_INSIGHT = {
+  structure: 'The deepest split in contemporary dance is about method rather than shape: a set syllabus versus improvisation from tasks and images.',
+  contact: 'One technique, Contact Improvisation, pulls this axis wide on its own; for the rest, partnering is optional.',
+  fall: 'Techniques disagree on whether balance is something to protect or something to give away.',
+  floor: 'Floor use separates the newer, release-based forms from the standing, codified ones.',
+  initiation: 'Centre-led and limb-led techniques form clear camps, with Forsythe and Cunningham at the limb end.',
+  dynamics: 'Dynamics range from Butoh\'s near-stillness to Graham\'s strikes, but most techniques sit in the middle.',
+  grounding: 'Most techniques lean grounded; only the ballet-influenced ones stay lifted.',
+  torso: 'Almost every technique here frees the spine. That shared value is part of what makes them "modern" or "contemporary" rather than classical.',
+};
+
+function renderSpread() {
+  const rows = axes.map((a, k) => ({ a, sd: stdVec[k] })).sort((x, y) => y.sd - x.sd);
+  const max = rows[0].sd;
+  $('#spread').innerHTML = rows
+    .map(
+      (r) => `<div class="bar-row"><a href="#axis-${r.a.id}">${r.a.label}</a><span class="bar"><i style="width:${(r.sd / max) * 100}%"></i></span><span class="mono">σ ${r.sd.toFixed(2)}</span></div>`
+    )
+    .join('');
+  const top = rows[0];
+  const bottom = rows[rows.length - 1];
+  $('#spread-note').innerHTML = `<strong>${top.a.label}</strong> varies most. ${AXIS_INSIGHT[top.a.id]} <strong>${bottom.a.label}</strong> varies least. ${AXIS_INSIGHT[bottom.a.id]}`;
+}
+renderSpread();
+
+function renderComponents() {
+  const order = (k) => techniques.map((t, i) => ({ t, v: pcaResult.points[i][k] })).sort((a, b) => b.v - a.v);
+  $('#pcs').innerHTML = pcaResult.components
+    .map((comp, k) => {
+      const load = axes.map((a, j) => ({ a, w: comp[j] })).sort((x, y) => Math.abs(y.w) - Math.abs(x.w));
+      const strong = load.slice(0, 3);
+      const plus = strong.map((l) => (l.w > 0 ? l.a.high : l.a.low));
+      const minus = strong.map((l) => (l.w > 0 ? l.a.low : l.a.high));
+      const ranked = order(k);
+      return `
+      <div class="pc">
+        <p class="eyebrow">Direction ${k + 1} · ${pct(pcaResult.explained[k])} of the differences</p>
+        <p class="pc-pole"><span class="pole">+</span> ${plus.join(', ')} <span class="pc-ex">${ranked.slice(0, 2).map((r) => chip(r.t)).join('')}</span></p>
+        <p class="pc-pole"><span class="pole">−</span> ${minus.join(', ')} <span class="pc-ex">${ranked.slice(-2).reverse().map((r) => chip(r.t)).join('')}</span></p>
+        <div class="loadings">${axes
+          .map((a, j) => {
+            const w = comp[j];
+            return `<div class="load-row"><span>${a.label}</span><span class="dbar"><i style="${w >= 0 ? 'left:50%' : `right:50%`};width:${Math.abs(w) * 50}%"></i></span><span class="mono">${w >= 0 ? '+' : '−'}${Math.abs(w).toFixed(2)}</span></div>`;
+          })
+          .join('')}</div>
+      </div>`;
+    })
+    .join('');
+}
+renderComponents();
+
+function renderRadars() {
+  const host = $('#radars');
+  host.innerHTML = '';
+  techniques.forEach((t) => {
+    const card = document.createElement('button');
+    card.className = 'radar-card';
+    card.dataset.open = t.id;
+    card.style.setProperty('--c', t.color);
+    card.innerHTML = `<div class="radar"></div><strong>${t.name}</strong><span class="muted">${t.founder.split(' (')[0]} · ${t.year}</span><span class="radar-sum">${t.summary}</span>`;
+    host.appendChild(card);
+    drawRadar(card.querySelector('.radar'), { values: t.vec, mean: meanVec, axes, color: t.color });
+  });
+}
+renderRadars();
+
 // ---------- Technique card (side drawer) ----------
 const drawer = $('#drawer');
 const drawerBody = $('#drawer-body');
@@ -188,45 +351,88 @@ async function fetchWiki(title) {
   }
 }
 
+// The axes on which a technique departs most from the average of all twelve.
+function signatureAxes(t, n = 3) {
+  return axes
+    .map((a, k) => ({ a, v: t.vec[k], d: t.vec[k] - meanVec[k], z: stdVec[k] ? (t.vec[k] - meanVec[k]) / stdVec[k] : 0 }))
+    .sort((x, y) => Math.abs(y.z) - Math.abs(x.z))
+    .slice(0, n);
+}
+
 function openTechnique(id) {
   const t = byId.get(id);
   if (!t) return;
   morph?.select(id);
   const nn = nearest(t.vec, techniques, 3, id);
+  const sig = signatureAxes(t);
+  drawerBody.dataset.id = id;
   drawerBody.innerHTML = `
     <p class="eyebrow" style="color:${t.color}">${t.year} · ${t.place}</p>
     <h3>${t.name}</h3>
     <p class="founder">${t.founder}</p>
+    <p class="lede">${t.summary}</p>
+
+    <h4>History</h4>
+    <p>${t.history}</p>
+
+    <h4>Key concepts</h4>
+    <dl class="concepts">${t.concepts.map((c) => `<dt>${c.term}</dt><dd>${c.desc}</dd>`).join('')}</dl>
+
+    <h4>Principles</h4>
     <ul class="principles">${t.principles.map((p) => `<li>${p}</li>`).join('')}</ul>
+
+    <h4>In class</h4>
+    <ul class="principles">${t.exercises.map((p) => `<li>${p}</li>`).join('')}</ul>
+
+    <h4>The eight numbers</h4>
+    <p class="muted small">Each dot is this technique's score; the tick is the average of all twelve.</p>
     <div class="scorebars">
       ${axes
         .map(
-          (a, i) => `<div class="sb-row" title="${a.desc}">
-            <span>${a.label}</span>
-            <span class="sb-track"><i style="left:${pct(t.vec[i])};background:${t.color}"></i></span>
+          (a, i) => `<div class="sb-row">
+            <a href="#axis-${a.id}" class="sb-label">${a.label}</a>
+            <span class="sb-track"><b style="left:${pct(meanVec[i])}"></b><i style="left:${pct(t.vec[i])};background:${t.color}"></i></span>
+            <span class="mono sb-val">${fmt(t.vec[i])}</span>
             <span class="sb-ends">${a.low} · ${a.high}</span>
+            <span class="sb-note">${t.notes?.[a.id] ?? ''}</span>
           </div>`
         )
         .join('')}
     </div>
-    <p class="why"><strong>Why these numbers:</strong> ${t.why}</p>
+
+    <h4>What sets it apart</h4>
+    <p>${t.distinct}</p>
+    <ul class="sig">${sig
+      .map(
+        (s) =>
+          `<li><strong>${s.a.label}</strong>: ${s.d > 0 ? 'more' : 'less'} ${s.a.high} than average <span class="mono">(${fmt(s.v)} vs ${fmt(meanVec[axes.indexOf(s.a)])})</span></li>`
+      )
+      .join('')}</ul>
+
     <h4>Nearest techniques</h4>
     <ul class="nn">${nn
-      .map((n) => `<li><button data-open="${n.item.id}" style="--c:${n.item.color}">${n.item.name}</button><span>${pct(n.sim)}</span></li>`)
+      .map((n) => `<li>${chip(n.item)}<span class="bar"><i style="width:${pct(n.sim)};background:${n.item.color}"></i></span><span>${pct(n.sim)}</span></li>`)
       .join('')}</ul>
-    <div class="wiki"><p class="muted">Loading Wikipedia summary…</p></div>
+
+    <h4>Key works</h4>
+    <ul class="principles">${t.works.map((w) => `<li>${w}</li>`).join('')}</ul>
+    <p class="muted">${t.legacy}</p>
+
+    <h4>From Wikipedia</h4>
+    <div class="wiki"><p class="muted">${t.wiki ? 'Loading…' : 'No dedicated Wikipedia article.'}</p></div>
     <button class="btn" data-try="${t.id}">Dance it in the explorer ↓</button>
   `;
   drawer.hidden = false;
+  drawer.scrollTop = 0;
   requestAnimationFrame(() => drawer.classList.add('is-open'));
-  fetchWiki(t.wiki).then((w) => {
-    const el = drawerBody.querySelector('.wiki');
-    if (!el || drawerBody.dataset.id !== id) return;
-    el.innerHTML = w
-      ? `<p>${w.text}</p><a href="${w.url}" target="_blank" rel="noopener">Read on Wikipedia ↗</a>`
-      : `<p class="muted">Wikipedia summary unavailable.</p>`;
-  });
-  drawerBody.dataset.id = id;
+  if (t.wiki)
+    fetchWiki(t.wiki).then((w) => {
+      const el = drawerBody.querySelector('.wiki');
+      if (!el || drawerBody.dataset.id !== id) return;
+      el.innerHTML = w
+        ? `<p>${w.text}</p><a href="${w.url}" target="_blank" rel="noopener">Read on Wikipedia ↗</a>`
+        : `<p class="muted">Wikipedia summary unavailable.</p>`;
+    });
 }
 
 function closeDrawer() {
@@ -236,15 +442,23 @@ function closeDrawer() {
 }
 $('#drawer-close').addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => e.key === 'Escape' && closeDrawer());
-drawerBody.addEventListener('click', (e) => {
+
+// Any element with data-open anywhere on the page opens that technique.
+document.addEventListener('click', (e) => {
   const open = e.target.closest('[data-open]');
-  if (open) openTechnique(open.dataset.open);
+  if (open) {
+    e.preventDefault();
+    openTechnique(open.dataset.open);
+    return;
+  }
   const tryIt = e.target.closest('[data-try]');
   if (tryIt) {
     setExplorer(byId.get(tryIt.dataset.try).scores);
     closeDrawer();
     $('#explore').scrollIntoView({ behavior: 'smooth' });
   }
+  // Links into the parameter section close the drawer so the target is visible.
+  if (e.target.closest('#drawer a[href^="#axis-"]')) closeDrawer();
 });
 
 // ---------- Morphospace ----------
@@ -264,15 +478,27 @@ function showPair(i, j) {
   const a = techniques[i];
   const b = techniques[j];
   const cmp = compareAxes(a.vec, b.vec, axes);
-  const row = (r) =>
-    `<li><strong>${r.axis.label}</strong> <span>${fmt(r.a)} / ${fmt(r.b)}</span></li>`;
+  const big = cmp.different[0].axis;
   pairBox.innerHTML = `
     <p class="eyebrow">${pct(simMatrix[i][j])} similar</p>
     <h3><span style="color:${a.color}">${a.name}</span> × <span style="color:${b.color}">${b.name}</span></h3>
-    <div class="pair-cols">
-      <div><h4>Most alike</h4><ul>${cmp.shared.map(row).join('')}</ul></div>
-      <div><h4>Most different</h4><ul>${cmp.different.map(row).join('')}</ul></div>
-    </div>`;
+    <div class="dumbbells">
+      ${axes
+        .map((ax, k) => {
+          const lo = Math.min(a.vec[k], b.vec[k]);
+          const hi = Math.max(a.vec[k], b.vec[k]);
+          return `<div class="db-row"><span>${ax.label}</span><span class="db-track">
+            <em style="left:${pct(lo)};width:${pct(hi - lo)}"></em>
+            <i style="left:${pct(a.vec[k])};background:${a.color}" title="${a.name} ${fmt(a.vec[k])}"></i>
+            <i style="left:${pct(b.vec[k])};background:${b.color}" title="${b.name} ${fmt(b.vec[k])}"></i>
+          </span></div>`;
+        })
+        .join('')}
+    </div>
+    <p class="muted small">Most alike on ${cmp.shared.map((r) => r.axis.label.toLowerCase()).join(', ')}. Most different on ${cmp.different.map((r) => r.axis.label.toLowerCase()).join(', ')}.</p>
+    <h4>The biggest difference: ${big.label.toLowerCase()}</h4>
+    <p><strong style="color:${a.color}">${a.name}</strong> (${fmt(a.scores[big.id])}): ${a.notes?.[big.id] ?? ''}</p>
+    <p><strong style="color:${b.color}">${b.name}</strong> (${fmt(b.scores[big.id])}): ${b.notes?.[big.id] ?? ''}</p>`;
 }
 drawHeatmap($('#heatmap'), { techniques, simMatrix, order: pcOrder, onPair: showPair, onSelect: openTechnique });
 {
@@ -286,7 +512,8 @@ drawHeatmap($('#heatmap'), { techniques, simMatrix, order: pcOrder, onPair: show
 drawLineage($('#lineage'), { techniques, ancestors: data.ancestors, onSelect: openTechnique });
 
 // ---------- Explorer ----------
-explorerFigure = createFigureScene($('#explore-figure'));
+explorerFigure = createFigureScene($('#explore-figure'), { style: figStyle });
+figures.push(explorerFigure);
 const sliders = $('#sliders');
 sliders.innerHTML = axes
   .map(
@@ -299,9 +526,7 @@ sliders.innerHTML = axes
   .join('');
 
 const presets = $('#presets');
-presets.innerHTML = techniques
-  .map((t) => `<button data-preset="${t.id}" style="--c:${t.color}">${t.name}</button>`)
-  .join('');
+presets.innerHTML = techniques.map((t) => `<button data-preset="${t.id}" style="--c:${t.color}">${t.name}</button>`).join('');
 presets.addEventListener('click', (e) => {
   const b = e.target.closest('[data-preset]');
   if (b) setExplorer(byId.get(b.dataset.preset).scores);
@@ -321,27 +546,17 @@ function updateExplorer() {
   const vec = axes.map((a) => p[a.id]);
   const nn = nearest(vec, techniques, 3);
   $('#explore-nearest').innerHTML = nn
-    .map(
-      (n) =>
-        `<li><button data-open="${n.item.id}" style="--c:${n.item.color}">${n.item.name}</button><span class="bar"><i style="width:${pct(n.sim)};background:${n.item.color}"></i></span><span>${pct(n.sim)}</span></li>`
-    )
+    .map((n) => `<li>${chip(n.item)}<span class="bar"><i style="width:${pct(n.sim)};background:${n.item.color}"></i></span><span>${pct(n.sim)}</span></li>`)
     .join('');
   morph.showCustom(vec);
 }
 sliders.addEventListener('input', updateExplorer);
-$('#explore-nearest').addEventListener('click', (e) => {
-  const b = e.target.closest('[data-open]');
-  if (b) openTechnique(b.dataset.open);
-});
 $('#randomise').addEventListener('click', () => setExplorer(Object.fromEntries(axes.map((a) => [a.id, Math.round(Math.random() * 100) / 100]))));
 setExplorer(NEUTRAL);
 
 // ---------- Theme toggle ----------
 const themeBtn = $('#theme-toggle');
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  themeBtn.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
-}
+themeBtn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀ Light' : '☾ Dark';
 themeBtn.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   try {
@@ -350,4 +565,3 @@ themeBtn.addEventListener('click', () => {
   // Charts and 3D materials read CSS colours at build time, so reload to repaint them.
   location.reload();
 });
-applyTheme(document.documentElement.dataset.theme || 'dark');

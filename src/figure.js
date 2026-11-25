@@ -101,8 +101,9 @@ const MOVES = {
     pose: (p) => {
       const T = 0.4 + 0.8 * p.torso;
       return {
-        pelvis: { x: -0.1 * T }, s1: { x: -0.12 * T }, s2: { x: -0.35 * T }, neck: { x: -0.45 * T },
-        arms: { a: 1.5, f: 0.5, e: 0.15 }, legs: { f: 0.25, k: 0.45, a: 0.06 },
+        // Chest lifts and opens; arms open in a high diagonal, palms up and soft.
+        pelvis: { x: -0.1 * T }, s1: { x: -0.15 * T }, s2: { x: -0.4 * T }, neck: { x: -0.5 * T },
+        arms: { a: 2.15, f: -0.25, e: 0.3 }, legs: { f: 0.3, k: 0.55, a: 0.06 },
       };
     },
   },
@@ -319,24 +320,60 @@ function cssVar(name, fallback) {
   return v || fallback;
 }
 
-function buildBody(mat, jointMat) {
-  const add = (parent, mesh, x = 0, y = 0, z = 0) => {
+const UP = new THREE.Vector3(0, 1, 0);
+const UNIT_SPHERE = new THREE.SphereGeometry(1, 24, 16);
+
+// Builds one dancer. The joint rig (groups) is shared by two "dressings":
+//   - flesh: a smooth mannequin body (solid, or a faint outline in skeleton mode)
+//   - bones: an anatomical skeleton — skull, vertebrae, ribcage, pelvis,
+//            long bones, hands and feet.
+function buildBody(mats) {
+  const flesh = [];
+  const bones = [];
+  const place = (list, parent, mesh, x = 0, y = 0, z = 0) => {
     mesh.position.set(x, y, z);
     mesh.castShadow = true;
     parent.add(mesh);
+    list.push(mesh);
     return mesh;
   };
-  const ellipsoid = (rx, ry, rz, m = mat) => {
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 20), m);
+  const F = (parent, mesh, x, y, z) => {
+    mesh.userData.solid = mesh.material;
+    return place(flesh, parent, mesh, x, y, z);
+  };
+  const B = (parent, mesh, x, y, z) => place(bones, parent, mesh, x, y, z);
+
+  const ellipsoid = (rx, ry, rz, m = mats.bone) => {
+    const mesh = new THREE.Mesh(UNIT_SPHERE, m);
     mesh.scale.set(rx, ry, rz);
     return mesh;
   };
-  const taper = (len, r1, r2, m = mat) => {
+  const ball = (r, m = mats.bone) => ellipsoid(r, r, r, m);
+  const taper = (len, r1, r2, m = mats.flesh) => {
     const g = new THREE.CylinderGeometry(r1, r2, len, 24, 1);
     g.translate(0, -len / 2, 0);
     return new THREE.Mesh(g, m);
   };
-  const ball = (r, m = jointMat) => new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16), m);
+  // A straight bone between two points.
+  const shaft = (parent, a, b, r, m = mats.bone) => {
+    const A = new THREE.Vector3(...a);
+    const Bv = new THREE.Vector3(...b);
+    const dir = Bv.clone().sub(A);
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.85, r, dir.length(), 10, 1), m);
+    mesh.quaternion.setFromUnitVectors(UP, dir.normalize());
+    return B(parent, mesh, (A.x + Bv.x) / 2, (A.y + Bv.y) / 2, (A.z + Bv.z) / 2);
+  };
+  // A curved bone (rib, clavicle, jaw) along a smooth path.
+  const curved = (parent, pts, r, m = mats.bone) => {
+    const c = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p)));
+    return B(parent, new THREE.Mesh(new THREE.TubeGeometry(c, 20, r, 6, false), m));
+  };
+  const vertebra = (parent, y, z, r) => {
+    B(parent, new THREE.Mesh(new THREE.CylinderGeometry(r, r, r * 0.9, 12), mats.bone), 0, y, z);
+    const spine = B(parent, new THREE.Mesh(new THREE.BoxGeometry(0.008, r * 0.7, r * 1.5), mats.bone), 0, y - r * 0.3, z - r * 1.4);
+    spine.rotation.x = 0.45;
+    B(parent, ellipsoid(r * 1.7, 0.005, 0.007), 0, y, z - r * 0.5);
+  };
   const marker = (parent, x, y, z) => {
     const o = new THREE.Object3D();
     o.position.set(x, y, z);
@@ -351,20 +388,72 @@ function buildBody(mat, jointMat) {
   };
 
   const root = new THREE.Group();
+
+  // ---- Pelvis ----
   const pelvis = group(root, 0, 0.94, 0);
-  add(pelvis, ellipsoid(0.15, 0.1, 0.1), 0, 0.02, 0);
+  F(pelvis, ellipsoid(0.15, 0.1, 0.1, mats.flesh), 0, 0.02, 0);
+  const sacrum = B(pelvis, ellipsoid(0.034, 0.058, 0.02), 0, 0.035, -0.06);
+  sacrum.rotation.x = -0.35;
+  for (const s of [1, -1]) {
+    const wing = B(pelvis, ellipsoid(0.068, 0.062, 0.015), s * 0.075, 0.06, -0.015);
+    wing.rotation.set(0, s * 0.9, -s * 0.3);
+    curved(pelvis, [[s * 0.07, -0.03, -0.02], [s * 0.062, -0.085, -0.022], [s * 0.035, -0.08, 0.02]], 0.011);
+  }
+  curved(pelvis, [[0.085, 0.02, -0.03], [0.075, -0.04, 0.01], [0.04, -0.066, 0.05], [0, -0.06, 0.065], [-0.04, -0.066, 0.05], [-0.075, -0.04, 0.01], [-0.085, 0.02, -0.03]], 0.012);
 
+  // ---- Lumbar spine (5 vertebrae, curving forward) ----
   const s1 = group(pelvis, 0, 0.08, 0);
-  add(s1, ellipsoid(0.115, 0.13, 0.085), 0, 0.1, 0);
-  const s2 = group(s1, 0, 0.2, 0);
-  add(s2, ellipsoid(0.16, 0.17, 0.105), 0, 0.12, 0);
+  F(s1, ellipsoid(0.115, 0.13, 0.085, mats.flesh), 0, 0.1, 0);
+  for (let i = 0; i < 5; i++) vertebra(s1, 0.015 + i * 0.038, -0.05 + 0.014 * Math.sin((Math.PI * (i + 0.5)) / 5), 0.022);
 
+  // ---- Thoracic spine, ribcage, sternum, clavicles, shoulder blades ----
+  const s2 = group(s1, 0, 0.2, 0);
+  F(s2, ellipsoid(0.16, 0.17, 0.105, mats.flesh), 0, 0.12, 0);
+  for (let i = 0; i < 10; i++) {
+    vertebra(s2, 0.012 + i * 0.026, -0.065 - 0.014 * Math.sin((Math.PI * (i + 0.5)) / 10), 0.02 - 0.005 * (i / 9));
+  }
+  for (let i = 0; i < 10; i++) {
+    const y = 0.235 - i * 0.02;
+    const rx = 0.055 + 0.075 * Math.sin((Math.PI * (i + 2)) / 13);
+    const dy = 0.035 + 0.004 * i;
+    const zf = 0.075 + 0.01 * Math.sin((Math.PI * (i + 1)) / 11);
+    for (const s of [1, -1]) {
+      const pts = [
+        [s * 0.018, y, -0.072],
+        [s * rx * 0.7, y + 0.004, -0.085],
+        [s * rx, y - dy * 0.35, -0.015],
+        [s * rx * 0.85, y - dy * 0.75, zf * 0.75],
+      ];
+      if (i < 7) pts.push([s * 0.02, y - dy, zf]); // true ribs reach the sternum
+      else if (i < 9) pts.push([s * 0.06, y - dy * 0.95, zf * 0.95]); // false ribs
+      else pts.splice(3, 1, [s * rx * 0.9, y - dy * 0.6, 0.03]); // floating rib
+      curved(s2, pts, 0.0062);
+    }
+  }
+  const sternum = B(s2, ellipsoid(0.017, 0.072, 0.009), 0, 0.13, 0.086);
+  sternum.rotation.x = -0.12;
+  for (const s of [1, -1]) {
+    curved(s2, [[s * 0.02, 0.215, 0.085], [s * 0.09, 0.235, 0.07], [s * 0.17, 0.235, 0.0]], 0.0085);
+    const scap = B(s2, ellipsoid(0.05, 0.07, 0.008), s * 0.11, 0.17, -0.095);
+    scap.rotation.set(0, -s * 0.4, s * 0.15);
+  }
+
+  // ---- Neck (cervical vertebrae) and skull ----
   const neck = group(s2, 0, 0.27, 0);
-  const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.046, 0.11, 16), mat);
-  add(neck, neckMesh, 0, 0.04, 0);
+  F(neck, new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.046, 0.11, 16), mats.flesh), 0, 0.04, 0);
+  for (let i = 0; i < 4; i++) vertebra(neck, i * 0.022, -0.015, 0.013);
   const head = group(neck, 0, 0.09, 0);
-  add(head, ellipsoid(0.085, 0.11, 0.1), 0, 0.1, 0.005);
-  add(head, ellipsoid(0.017, 0.026, 0.02, jointMat), 0, 0.085, 0.1); // nose: shows where the face points
+  F(head, ellipsoid(0.085, 0.11, 0.1, mats.flesh), 0, 0.1, 0.005);
+  F(head, ellipsoid(0.017, 0.026, 0.02, mats.fleshJoint), 0, 0.085, 0.1);
+  B(head, ellipsoid(0.075, 0.085, 0.095), 0, 0.13, -0.01); // cranium
+  B(head, ellipsoid(0.056, 0.05, 0.055), 0, 0.075, 0.035); // face
+  for (const s of [1, -1]) {
+    B(head, ellipsoid(0.02, 0.017, 0.012, mats.socket), s * 0.027, 0.1, 0.083); // eye socket
+    B(head, ellipsoid(0.012, 0.01, 0.028), s * 0.052, 0.08, 0.045); // cheekbone
+  }
+  B(head, ellipsoid(0.008, 0.014, 0.006, mats.socket), 0, 0.072, 0.088); // nasal cavity
+  B(head, new THREE.Mesh(new THREE.BoxGeometry(0.044, 0.011, 0.008), mats.bone), 0, 0.042, 0.083); // teeth
+  curved(head, [[0.05, 0.075, 0], [0.047, 0.035, 0.02], [0.03, 0.018, 0.06], [0, 0.014, 0.073], [-0.03, 0.018, 0.06], [-0.047, 0.035, 0.02], [-0.05, 0.075, 0]], 0.009); // jaw
 
   const contacts = [
     marker(pelvis, 0, -0.08, 0),
@@ -378,39 +467,90 @@ function buildBody(mat, jointMat) {
     marker(head, -0.085, 0.1, 0),
   ];
 
+  // ---- Arms: humerus, radius & ulna, hand bones ----
   const arms = [1, -1].map((s) => {
     const shoulder = group(s2, s * 0.19, 0.23, 0);
-    add(shoulder, ball(0.05));
+    F(shoulder, ball(0.05, mats.fleshJoint));
     const upper = group(shoulder);
-    add(upper, taper(0.29, 0.047, 0.036));
+    F(upper, taper(0.29, 0.047, 0.036));
+    B(upper, ball(0.026));
+    shaft(upper, [0, -0.02, 0], [0, -0.265, 0], 0.012);
+    B(upper, ellipsoid(0.026, 0.014, 0.016), 0, -0.28, 0);
+
     const fore = group(upper, 0, -0.29, 0);
-    add(fore, ball(0.037));
-    add(fore, taper(0.25, 0.035, 0.026));
+    F(fore, ball(0.037, mats.fleshJoint));
+    F(fore, taper(0.25, 0.035, 0.026));
+    B(fore, ball(0.014), 0, 0, -0.012);
+    shaft(fore, [0, -0.01, 0.009], [0, -0.24, 0.011], 0.0075); // radius
+    shaft(fore, [0, -0.005, -0.009], [0, -0.24, -0.007], 0.0075); // ulna
+
     const wrist = group(fore, 0, -0.25, 0);
-    add(wrist, ellipsoid(0.028, 0.075, 0.045), 0, -0.07, 0);
+    F(wrist, ellipsoid(0.028, 0.075, 0.045, mats.flesh), 0, -0.07, 0);
+    B(wrist, ellipsoid(0.012, 0.016, 0.022), 0, -0.015, 0); // carpals
+    const fingerLen = [0.045, 0.05, 0.047, 0.038];
+    fingerLen.forEach((ph, j) => {
+      const z = 0.016 - j * 0.011;
+      shaft(wrist, [0, -0.03, z * 0.8], [0, -0.08, z], 0.0042);
+      shaft(wrist, [0, -0.084, z], [-s * 0.008, -0.084 - ph, z * 1.05], 0.0036);
+    });
+    shaft(wrist, [-s * 0.004, -0.02, 0.02], [-s * 0.014, -0.055, 0.035], 0.0045); // thumb
+    shaft(wrist, [-s * 0.014, -0.058, 0.036], [-s * 0.02, -0.085, 0.04], 0.004);
     const tip = marker(wrist, 0, -0.15, 0);
     contacts.push(tip, marker(fore, 0, 0, 0));
     return { s, upper, fore, tip };
   });
 
+  // ---- Legs: femur, patella, tibia & fibula, foot bones ----
   const legs = [1, -1].map((s) => {
     const hip = group(pelvis, s * 0.09, -0.02, 0);
-    add(hip, ball(0.075));
+    F(hip, ball(0.075, mats.fleshJoint));
     const thigh = group(hip);
-    add(thigh, taper(0.44, 0.075, 0.05));
+    F(thigh, taper(0.44, 0.075, 0.05));
+    B(thigh, ball(0.024));
+    shaft(thigh, [0, 0, 0], [s * 0.035, -0.03, 0], 0.012); // femoral neck
+    B(thigh, ball(0.018), s * 0.04, -0.03, -0.005); // greater trochanter
+    shaft(thigh, [s * 0.035, -0.04, 0], [s * 0.005, -0.41, 0.005], 0.014);
+    B(thigh, ellipsoid(0.034, 0.02, 0.028), 0, -0.425, 0);
+
     const shin = group(thigh, 0, -0.44, 0);
-    add(shin, ball(0.052));
-    add(shin, taper(0.43, 0.05, 0.034));
+    F(shin, ball(0.052, mats.fleshJoint));
+    F(shin, taper(0.43, 0.05, 0.034));
+    B(shin, ellipsoid(0.017, 0.021, 0.009), 0, 0.012, 0.035); // patella
+    B(shin, ellipsoid(0.034, 0.012, 0.026), 0, -0.012, 0);
+    shaft(shin, [-s * 0.004, -0.02, 0.004], [-s * 0.008, -0.405, 0], 0.013); // tibia
+    shaft(shin, [s * 0.024, -0.03, -0.008], [s * 0.02, -0.41, -0.006], 0.0065); // fibula
+    B(shin, ball(0.011), -s * 0.014, -0.418, 0);
+    B(shin, ball(0.011), s * 0.022, -0.425, -0.006);
+
     const foot = group(shin, 0, -0.43, 0);
-    add(foot, ball(0.036));
-    add(foot, ellipsoid(0.042, 0.035, 0.12), 0, -0.04, 0.06);
+    F(foot, ball(0.036, mats.fleshJoint));
+    F(foot, ellipsoid(0.042, 0.035, 0.12, mats.flesh), 0, -0.04, 0.06);
+    B(foot, ellipsoid(0.017, 0.013, 0.02), 0, -0.022, 0.005); // talus
+    B(foot, ellipsoid(0.018, 0.022, 0.035), 0, -0.05, -0.02); // heel bone
+    B(foot, ellipsoid(0.03, 0.014, 0.022), 0, -0.048, 0.04); // midfoot
+    for (let j = 0; j < 5; j++) {
+      const x = -s * (0.022 - j * 0.011);
+      shaft(foot, [x * 0.55, -0.05, 0.055], [x, -0.066, 0.125], j === 0 ? 0.0065 : 0.0045);
+      shaft(foot, [x, -0.068, 0.13], [x * 1.05, -0.07, j === 0 ? 0.17 : 0.16], j === 0 ? 0.0055 : 0.0038);
+    }
     const heel = marker(foot, 0, -0.072, -0.045);
     const toe = marker(foot, 0, -0.072, 0.175);
     contacts.push(heel, toe, marker(shin, 0, 0, 0.05));
     return { s, thigh, shin, foot, heel, toe };
   });
 
-  return { root, pelvis, s1, s2, neck, arms, legs, contacts };
+  return { root, pelvis, s1, s2, neck, arms, legs, contacts, flesh, bones };
+}
+
+// Skeleton mode shows bones inside a faint body outline; body mode shows the
+// solid mannequin.
+function setBodyStyle(body, style, ghost) {
+  const skel = style === 'skeleton';
+  body.flesh.forEach((m) => {
+    m.material = skel ? ghost : m.userData.solid;
+    m.castShadow = !skel;
+  });
+  body.bones.forEach((m) => (m.visible = skel));
 }
 
 function applyPose(body, P) {
@@ -475,7 +615,8 @@ function addLife(P, p, time, phase) {
   return out;
 }
 
-export function createFigureScene(container, { trail = true } = {}) {
+export function createFigureScene(container, { trail = true, style: initialStyle = 'skeleton' } = {}) {
+  let style = initialStyle;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
@@ -484,7 +625,7 @@ export function createFigureScene(container, { trail = true } = {}) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  const lookAt = new THREE.Vector3(0, 0.82, 0);
+  const lookAt = new THREE.Vector3(0, 0.95, 0); // frames a full overhead reach
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x404050, 1.3));
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
@@ -503,15 +644,34 @@ export function createFigureScene(container, { trail = true } = {}) {
   scene.add(rim);
 
   const bodyColor = cssVar('--figure', '#e8dcc8');
-  const mainMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.62, metalness: 0.02 });
-  const mainJoint = new THREE.MeshStandardMaterial({ color: new THREE.Color(bodyColor).multiplyScalar(0.72), roughness: 0.5 });
+  const boneColor = cssVar('--bone', '#e6dcc6');
+  const socketColor = cssVar('--socket', '#221d17');
   const accent = cssVar('--accent', '#e0603a');
-  const partnerMat = new THREE.MeshStandardMaterial({ color: accent, roughness: 0.62, transparent: true, opacity: 0 });
-  const partnerJoint = new THREE.MeshStandardMaterial({ color: new THREE.Color(accent).multiplyScalar(0.75), roughness: 0.5, transparent: true, opacity: 0 });
+  const GHOST = 0.14; // opacity of the body outline around the skeleton
 
-  const dancer = buildBody(mainMat, mainJoint);
-  const partner = buildBody(partnerMat, partnerJoint);
+  function makeMats(fleshColor, boneTint, fade) {
+    const opts = (extra) => ({ roughness: 0.6, metalness: 0.02, transparent: fade, opacity: fade ? 0 : 1, ...extra });
+    return {
+      flesh: new THREE.MeshStandardMaterial(opts({ color: fleshColor })),
+      fleshJoint: new THREE.MeshStandardMaterial(opts({ color: new THREE.Color(fleshColor).multiplyScalar(0.72), roughness: 0.5 })),
+      ghost: new THREE.MeshStandardMaterial({ color: fleshColor, roughness: 0.8, transparent: true, opacity: fade ? 0 : GHOST, depthWrite: false }),
+      bone: new THREE.MeshStandardMaterial(opts({ color: boneTint, roughness: 0.5 })),
+      socket: new THREE.MeshStandardMaterial(opts({ color: socketColor, roughness: 0.9 })),
+    };
+  }
+  const mainMats = makeMats(bodyColor, boneColor, false);
+  const partnerMats = makeMats(accent, new THREE.Color(boneColor).lerp(new THREE.Color(accent), 0.55), true);
+
+  const dancer = buildBody(mainMats);
+  const partner = buildBody(partnerMats);
   scene.add(dancer.root, partner.root);
+
+  function setStyle(s) {
+    style = s;
+    setBodyStyle(dancer, s, mainMats.ghost);
+    setBodyStyle(partner, s, partnerMats.ghost);
+  }
+  setStyle(style);
 
   // Floor: catches real shadows, plus a thin ring marking the dance space.
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.ShadowMaterial({ opacity: 0.22 }));
@@ -553,7 +713,7 @@ export function createFigureScene(container, { trail = true } = {}) {
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     // Pull back on narrow screens so a duet or a fall still fits.
-    wide = width / height < 0.8 ? 6.6 : 4.8;
+    wide = width / height < 0.8 ? 7.2 : 5.6;
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(container);
@@ -590,7 +750,7 @@ export function createFigureScene(container, { trail = true } = {}) {
       applyPose(partner, P2);
       settle(partner, c * 0.62);
     }
-    partnerMat.opacity = partnerJoint.opacity = c;
+    for (const [k, m] of Object.entries(partnerMats)) m.opacity = k === 'ghost' ? c * GHOST : c;
 
     // Slow, subtle camera drift gives depth without distracting.
     const ang = 0.18 + Math.sin(time * 0.12) * 0.12;
@@ -618,6 +778,7 @@ export function createFigureScene(container, { trail = true } = {}) {
     },
     getCurrent: () => ({ ...current }),
     getStep: () => lead.step(),
+    setStyle,
     snap(params) {
       Object.assign(current, params);
       target = { ...current };

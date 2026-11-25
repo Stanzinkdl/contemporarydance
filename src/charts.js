@@ -87,6 +87,51 @@ export function drawHeatmap(container, { techniques, simMatrix, order, onPair, o
     .on('click', (_, t) => onSelect?.(t.id));
 }
 
+// Radar profile of one technique's eight numbers, with the average of all
+// techniques as a dashed outline for reference.
+const SHORT = { grounding: 'Weight', torso: 'Torso', dynamics: 'Dyn.', floor: 'Floor', initiation: 'Init.', structure: 'Struct.', fall: 'Balance', contact: 'Contact' };
+export function drawRadar(container, { values, mean, axes, color, size = 190 }) {
+  const r = size / 2 - 26;
+  const n = axes.length;
+  const angle = (i) => (i / n) * Math.PI * 2;
+  const pt = (v, i) => [Math.sin(angle(i)) * r * v, -Math.cos(angle(i)) * r * v];
+  const svg = d3
+    .select(container)
+    .append('svg')
+    .attr('viewBox', `${-size / 2} ${-size / 2} ${size} ${size}`)
+    .attr('role', 'img')
+    .attr('aria-label', axes.map((a, i) => `${a.label} ${values[i].toFixed(2)}`).join(', '));
+
+  [0.25, 0.5, 0.75, 1].forEach((v) =>
+    svg.append('polygon').attr('class', 'radar-ring').attr('points', axes.map((_, i) => pt(v, i).join(',')).join(' '))
+  );
+  axes.forEach((a, i) => {
+    const [x, y] = pt(1, i);
+    svg.append('line').attr('class', 'radar-spoke').attr('x1', 0).attr('y1', 0).attr('x2', x).attr('y2', y);
+    const [lx, ly] = pt(1.2, i);
+    svg
+      .append('text')
+      .attr('class', 'radar-label')
+      .attr('x', lx)
+      .attr('y', ly + 3)
+      .attr('text-anchor', Math.abs(lx) < 4 ? 'middle' : lx > 0 ? 'start' : 'end')
+      .text(SHORT[a.id] ?? a.label);
+  });
+  svg.append('polygon').attr('class', 'radar-mean').attr('points', mean.map((v, i) => pt(v, i).join(',')).join(' '));
+  svg
+    .append('polygon')
+    .attr('points', values.map((v, i) => pt(v, i).join(',')).join(' '))
+    .attr('fill', color)
+    .attr('fill-opacity', 0.28)
+    .attr('stroke', color)
+    .attr('stroke-width', 2)
+    .attr('stroke-linejoin', 'round');
+  values.forEach((v, i) => {
+    const [x, y] = pt(v, i);
+    svg.append('circle').attr('cx', x).attr('cy', y).attr('r', 2.5).attr('fill', color);
+  });
+}
+
 // Lineage map: time runs left to right; lines connect teachers to the techniques
 // that grew out of them. Grey hollow nodes are ancestors without scores.
 export function drawLineage(container, { techniques, ancestors, onSelect }) {
