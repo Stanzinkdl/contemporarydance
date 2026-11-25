@@ -54,6 +54,7 @@ const smooth = (t) => t * t * (3 - 2 * t);
 
 const stage = $('#stage-figure');
 const figure = createFigureScene(stage);
+let explorerFigure = null; // created further down, in the explorer section
 figure.snap(resolvedSteps[0].frames[0]);
 
 const stepEls = [...document.querySelectorAll('.step')];
@@ -132,10 +133,35 @@ function buildHud(container) {
     });
 }
 const updateHud = buildHud($('#hud'));
+// The phrase as a row of numbered step chips; the current step is lit.
+function phraseRenderer(el) {
+  let sig = '';
+  let active = -1;
+  return (step) => {
+    // The closing "Stand" is the same as the opening one, so it isn't shown twice.
+    const steps = step.steps.slice(0, -1);
+    const s = steps.join('|');
+    if (s !== sig) {
+      sig = s;
+      active = -1;
+      el.innerHTML = steps.map((name, i) => `<li><span>${i + 1}</span>${name}</li>`).join('');
+    }
+    const idx = step.index % steps.length;
+    if (idx !== active) {
+      active = idx;
+      [...el.children].forEach((li, i) => li.classList.toggle('is-active', i === idx));
+    }
+  };
+}
+const renderStagePhrase = phraseRenderer($('#stage-steps'));
+const renderExplorePhrase = phraseRenderer($('#explore-steps'));
+
 const nearestLabel = $('#stage-nearest');
 (function hudLoop() {
   const cur = figure.getCurrent();
   updateHud(cur);
+  renderStagePhrase(figure.getStep());
+  if (explorerFigure) renderExplorePhrase(explorerFigure.getStep());
   const nn = nearest(axes.map((a) => cur[a.id]), techniques, 1)[0];
   nearestLabel.textContent = `closest: ${nn.item.name} · ${pct(nn.sim)}`;
   requestAnimationFrame(hudLoop);
@@ -260,7 +286,7 @@ drawHeatmap($('#heatmap'), { techniques, simMatrix, order: pcOrder, onPair: show
 drawLineage($('#lineage'), { techniques, ancestors: data.ancestors, onSelect: openTechnique });
 
 // ---------- Explorer ----------
-const explorerFigure = createFigureScene($('#explore-figure'));
+explorerFigure = createFigureScene($('#explore-figure'));
 const sliders = $('#sliders');
 sliders.innerHTML = axes
   .map(

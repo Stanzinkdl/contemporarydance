@@ -38,6 +38,7 @@
       <div class="stage">
         <div id="stage-figure" class="stage-figure" aria-label="Animated figure dancing the current technique values"></div>
         <div class="stage-hud">
+          <ol id="stage-steps" class="phrase" aria-label="Steps of the current phrase"></ol>
           <p id="stage-nearest" class="stage-nearest"></p>
           <div id="hud" class="hud"></div>
         </div>
@@ -163,7 +164,10 @@
         <p>Set the eight numbers, watch the figure dance them, and see which existing techniques yours is closest to. Your technique also shows up as a marker in the morphospace above.</p>
       </header>
       <div class="explore-grid">
-        <div id="explore-figure" class="explore-figure"></div>
+        <div class="explore-stage">
+          <div id="explore-figure" class="explore-figure"></div>
+          <ol id="explore-steps" class="phrase" aria-label="Steps of your technique's phrase"></ol>
+        </div>
         <div class="explore-controls">
           <div id="sliders" class="sliders"></div>
           <div class="explore-actions">

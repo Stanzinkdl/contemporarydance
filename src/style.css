@@ -95,13 +95,37 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 @media (max-width: 860px) {
   .essay { grid-template-columns: 1fr; }
-  .stage { height: 62svh; padding: 3.2rem 0.5rem 0.5rem; z-index: 1; background: var(--bg); }
-  .stage-hud { display: none; }
+  /* Figure pinned to the top; text cards scroll up from below it. */
+  .stage { height: 58svh; padding: 3.2rem 0.5rem 0.3rem; z-index: 1; background: var(--bg); }
   .step-nav { display: none; }
-  .steps { padding: 0 1rem 20vh; position: relative; z-index: 2; }
-  .step { min-height: 80svh; justify-content: flex-start; padding-top: 4svh; opacity: 1; }
-  .step > * { background: color-mix(in srgb, var(--bg) 88%, transparent); }
-  .step h1, .step h2 { padding: 0.3em 0; }
+  .steps { padding: 0 1rem 30vh; position: relative; z-index: 2; margin-top: -10svh; }
+  .step { min-height: 90svh; justify-content: flex-start; padding-top: 0; opacity: 1; }
+  .step:first-child { padding-top: 12svh; }
+  .step > * { margin-left: -1rem; margin-right: -1rem; padding-left: 1rem; padding-right: 1rem; background: var(--bg); }
+  .step > *:first-child { padding-top: 1.2rem; border-top: 1px solid var(--line); margin-top: 0; }
+  .step h1, .step h2 { margin: 0; padding-bottom: 0.6em; }
+  .step p { margin: 0; padding-bottom: 1em; }
+}
+
+/* ---------- Phrase steps ---------- */
+.phrase { list-style: none; display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0; margin: 0 0 0.8rem; }
+.phrase li {
+  display: inline-flex; align-items: center; gap: 0.4em;
+  padding: 0.25rem 0.65rem 0.25rem 0.3rem; border: 1px solid var(--line); border-radius: 999px;
+  font: 500 0.75rem var(--sans); color: var(--muted);
+  transition: background 0.35s, color 0.35s, border-color 0.35s;
+}
+.phrase li span {
+  display: inline-grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%;
+  background: var(--line); color: var(--bg); font: 600 0.65rem var(--mono);
+}
+.phrase li.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.phrase li.is-active span { background: #fff; color: var(--accent); }
+.explore-stage .phrase { margin-top: 0.8rem; }
+@media (max-width: 860px) {
+  .stage-hud { display: block; padding: 0 0.5rem; }
+  .stage-hud .hud, .stage-hud .stage-nearest { display: none; }
+  .phrase { margin-bottom: 0.3rem; }
 }
 
 /* ---------- Panels ---------- */
