@@ -1,0 +1,120 @@
+{
+  "axes": [
+    { "id": "grounding",  "label": "Weight",      "low": "lifted",        "high": "grounded",         "desc": "Where the body's weight lives: pulled up and away from the floor, or yielded into it." },
+    { "id": "torso",      "label": "Torso",       "low": "vertical, held", "high": "curved, spiralling", "desc": "How much the spine bends, contracts and twists instead of staying a vertical column." },
+    { "id": "dynamics",   "label": "Dynamics",    "low": "sustained",     "high": "percussive",       "desc": "The energy shape of a phrase: smooth and continuous, or sharp attacks and stops." },
+    { "id": "floor",      "label": "Floor",       "low": "upright",       "high": "floor-based",      "desc": "How much of the technique happens on, into and through the floor." },
+    { "id": "initiation", "label": "Initiation",  "low": "periphery",     "high": "centre",           "desc": "Where movement starts: hands, feet and points in space, or the pelvis, breath and centre." },
+    { "id": "structure",  "label": "Structure",   "low": "improvised",    "high": "codified",         "desc": "A fixed vocabulary taught as set exercises, or tasks and principles you improvise from." },
+    { "id": "fall",       "label": "Balance",     "low": "held",          "high": "fall & recovery",  "desc": "Whether balance is something to keep, or something to give up and catch again." },
+    { "id": "contact",    "label": "Contact",     "low": "solo",          "high": "shared weight",    "desc": "How much the practice depends on touching, leaning on and carrying another body." }
+  ],
+
+  "techniques": [
+    {
+      "id": "graham", "name": "Graham", "founder": "Martha Graham", "year": 1926, "place": "New York",
+      "wiki": "Graham technique",
+      "parents": ["denishawn"],
+      "principles": ["Contraction and release", "Spiral of the torso", "Floor work as a warm-up sequence", "Movement driven from the pelvis"],
+      "scores": { "grounding": 0.70, "torso": 0.92, "dynamics": 0.80, "floor": 0.60, "initiation": 0.95, "structure": 0.95, "fall": 0.45, "contact": 0.05 },
+      "why": "The contraction is a sharp, pelvis-driven curve of the spine, practised as a fixed class order that starts seated on the floor."
+    },
+    {
+      "id": "horton", "name": "Horton", "founder": "Lester Horton", "year": 1938, "place": "Los Angeles",
+      "wiki": "Lester Horton",
+      "parents": [],
+      "principles": ["Flat backs and lateral stretches", "Long lines through the whole body", "Studies built for strength and flexibility", "Hinges and fortifications"],
+      "scores": { "grounding": 0.55, "torso": 0.50, "dynamics": 0.50, "floor": 0.30, "initiation": 0.45, "structure": 0.95, "fall": 0.40, "contact": 0.05 },
+      "why": "A strongly codified anatomical system; the torso works in straight planes (flat back, lateral T) more than curves."
+    },
+    {
+      "id": "limon", "name": "Limón", "founder": "José Limón (after Doris Humphrey)", "year": 1946, "place": "New York",
+      "wiki": "José Limón",
+      "parents": ["humphrey"],
+      "principles": ["Fall and recovery", "Suspension and rebound", "Breath as phrasing", "Successional movement through the body"],
+      "scores": { "grounding": 0.75, "torso": 0.70, "dynamics": 0.40, "floor": 0.40, "initiation": 0.70, "structure": 0.75, "fall": 0.95, "contact": 0.15 },
+      "why": "Built on Humphrey's 'arc between two deaths': giving in to gravity and suspending out of it, on the breath."
+    },
+    {
+      "id": "dunham", "name": "Dunham", "founder": "Katherine Dunham", "year": 1945, "place": "Chicago / New York",
+      "wiki": "Katherine Dunham",
+      "parents": [],
+      "principles": ["Isolations of hips, ribs and shoulders", "Polyrhythm in the body", "Undulating spine", "Afro-Caribbean roots with ballet and modern training"],
+      "scores": { "grounding": 0.80, "torso": 0.80, "dynamics": 0.70, "floor": 0.20, "initiation": 0.80, "structure": 0.85, "fall": 0.20, "contact": 0.10 },
+      "why": "Grounded, pelvis-centred and rhythmic, with an articulate, isolating torso taught through set progressions."
+    },
+    {
+      "id": "cunningham", "name": "Cunningham", "founder": "Merce Cunningham", "year": 1953, "place": "New York",
+      "wiki": "Cunningham technique",
+      "parents": ["graham", "ballet"],
+      "principles": ["Curve, arch, tilt and twist of the upper back", "Ballet-derived legs and speed", "Changes of direction", "Movement free of narrative"],
+      "scores": { "grounding": 0.30, "torso": 0.55, "dynamics": 0.60, "floor": 0.10, "initiation": 0.30, "structure": 0.90, "fall": 0.10, "contact": 0.05 },
+      "why": "Upright and quick on ballet legs; the back bends in five set directions while balance stays sharply controlled."
+    },
+    {
+      "id": "butoh", "name": "Butoh", "founder": "Tatsumi Hijikata & Kazuo Ohno", "year": 1959, "place": "Tokyo",
+      "wiki": "Butoh",
+      "parents": ["ausdruckstanz"],
+      "principles": ["Extreme slowness", "Image-driven transformation", "Low, bent-legged stance", "The body being moved rather than moving"],
+      "scores": { "grounding": 0.90, "torso": 0.70, "dynamics": 0.10, "floor": 0.50, "initiation": 0.70, "structure": 0.30, "fall": 0.30, "contact": 0.05 },
+      "why": "Deeply grounded and almost continuously slow; worked through images rather than a fixed step vocabulary."
+    },
+    {
+      "id": "release", "name": "Release Technique", "founder": "Joan Skinner, Mary Fulkerson and others", "year": 1970, "place": "USA / UK",
+      "wiki": "Release technique",
+      "parents": ["ideokinesis", "judson"],
+      "principles": ["Skeletal alignment over muscular holding", "Imagery (ideokinesis)", "Efficiency and ease", "Using momentum and gravity"],
+      "scores": { "grounding": 0.70, "torso": 0.70, "dynamics": 0.20, "floor": 0.55, "initiation": 0.60, "structure": 0.35, "fall": 0.60, "contact": 0.20 },
+      "why": "Lets go of held tension and trusts weight and momentum; taught through images and principles more than set steps."
+    },
+    {
+      "id": "contact", "name": "Contact Improvisation", "founder": "Steve Paxton", "year": 1972, "place": "New York",
+      "wiki": "Contact improvisation",
+      "parents": ["judson", "cunningham"],
+      "principles": ["A shared point of contact", "Giving and taking weight", "Rolling, falling and lifting", "The small dance of standing"],
+      "scores": { "grounding": 0.70, "torso": 0.60, "dynamics": 0.30, "floor": 0.60, "initiation": 0.60, "structure": 0.10, "fall": 0.75, "contact": 1.00 },
+      "why": "An improvised duet form whose whole subject is the moving point of contact and shared weight."
+    },
+    {
+      "id": "forsythe", "name": "Improvisation Technologies", "founder": "William Forsythe", "year": 1994, "place": "Frankfurt",
+      "wiki": "William Forsythe (choreographer)",
+      "parents": ["ballet"],
+      "principles": ["Points, lines and planes in space", "Inscribing and extruding shapes", "Ballet geometry taken apart", "Rules for improvising"],
+      "scores": { "grounding": 0.30, "torso": 0.70, "dynamics": 0.60, "floor": 0.20, "initiation": 0.20, "structure": 0.40, "fall": 0.50, "contact": 0.05 },
+      "why": "Movement starts from imagined points and lines around the body, then is improvised with clear operations."
+    },
+    {
+      "id": "flyinglow", "name": "Flying Low", "founder": "David Zambrano", "year": 1995, "place": "Amsterdam / Brussels",
+      "wiki": null,
+      "parents": ["release", "contact"],
+      "principles": ["Spiralling in and out of the floor", "Moving fast close to the ground", "Breath and centre", "Moving with the group's energy"],
+      "scores": { "grounding": 0.90, "torso": 0.70, "dynamics": 0.70, "floor": 0.90, "initiation": 0.85, "structure": 0.45, "fall": 0.70, "contact": 0.20 },
+      "why": "Very low, very fast travel in and out of the floor, organised from the centre in spirals."
+    },
+    {
+      "id": "gaga", "name": "Gaga", "founder": "Ohad Naharin", "year": 1999, "place": "Tel Aviv",
+      "wiki": "Ohad Naharin",
+      "parents": ["graham"],
+      "principles": ["Listening to sensation", "Floating and 'boiling' textures", "Explosive power from ease", "No mirrors; improvised from instructions"],
+      "scores": { "grounding": 0.50, "torso": 0.85, "dynamics": 0.60, "floor": 0.20, "initiation": 0.60, "structure": 0.20, "fall": 0.40, "contact": 0.05 },
+      "why": "Improvised from spoken images, with a very fluid, articulate spine and a wide dynamic range."
+    },
+    {
+      "id": "countertechnique", "name": "Countertechnique", "founder": "Anouk van Dijk", "year": 2003, "place": "Amsterdam",
+      "wiki": "Anouk van Dijk",
+      "parents": ["release"],
+      "principles": ["Sending body parts in opposite directions", "Less tension, more space", "Scanning the body", "Big off-balance movement without strain"],
+      "scores": { "grounding": 0.55, "torso": 0.60, "dynamics": 0.50, "floor": 0.30, "initiation": 0.50, "structure": 0.60, "fall": 0.65, "contact": 0.05 },
+      "why": "A set class with clear tools that uses counter-directions to go off balance safely."
+    }
+  ],
+
+  "ancestors": [
+    { "id": "ballet",       "name": "Classical ballet",      "year": 1900, "parents": [] },
+    { "id": "denishawn",    "name": "Denishawn",             "year": 1915, "parents": [] },
+    { "id": "ausdruckstanz","name": "Ausdruckstanz",         "year": 1920, "parents": [] },
+    { "id": "humphrey",     "name": "Humphrey–Weidman",      "year": 1928, "parents": ["denishawn"] },
+    { "id": "ideokinesis",  "name": "Ideokinesis",           "year": 1937, "parents": [] },
+    { "id": "judson",       "name": "Judson Dance Theater",  "year": 1962, "parents": ["cunningham"] }
+  ]
+}

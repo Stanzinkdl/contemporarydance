@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>One Body, Eight Numbers — a morphospace of contemporary dance</title>
+    <meta name="description" content="A scroll essay and 3D map of contemporary dance techniques — Graham, Limón, Cunningham, Release, Contact, Gaga and more — described by eight numbers and compared by similarity." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+    <script>
+      // Set the theme before first paint to avoid a flash.
+      (function () {
+        var t = 'dark';
+        try {
+          var s = localStorage.getItem('dance-theme');
+          if (s === 'light' || s === 'dark') t = s;
+          else if (matchMedia('(prefers-color-scheme: light)').matches) t = 'light';
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <span class="brand">ONE BODY / EIGHT NUMBERS</span>
+      <nav>
+        <a href="#space">Morphospace</a>
+        <a href="#kinship">Similarity</a>
+        <a href="#lineage-sec">Lineage</a>
+        <a href="#explore">Explore</a>
+        <button id="theme-toggle" class="ghost"></button>
+      </nav>
+    </header>
+
+    <!-- ============ Scroll essay ============ -->
+    <section class="essay">
+      <div class="stage">
+        <div id="stage-figure" class="stage-figure" aria-label="Animated figure dancing the current technique values"></div>
+        <div class="stage-hud">
+          <p id="stage-nearest" class="stage-nearest"></p>
+          <div id="hud" class="hud"></div>
+        </div>
+        <nav id="step-nav" class="step-nav" aria-label="Essay sections"></nav>
+      </div>
+
+      <div class="steps">
+        <article class="step">
+          <p class="eyebrow">01 · The idea</p>
+          <h1>Every technique is the same body, asking different questions.</h1>
+          <p>Graham, Limón, Cunningham, Release, Contact, Gaga. Each one trains the same bones and muscles. What changes is what they ask of them.</p>
+          <p>Where is your weight? Does the spine stay tall or curve? Do you keep your balance or give it away? Change those answers and you change the dance.</p>
+          <p class="hint">Scroll to change the numbers</p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">02 · Weight</p>
+          <h2>Up and away, or down and in.</h2>
+          <p>The first number is where the weight lives. Ballet and Cunningham pull up out of the floor. Butoh goes the other way: knees bent, weight dropped, the body sinking toward the ground.</p>
+          <p>The figure is Butoh's numbers with only this one changing.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">03 · Torso</p>
+          <h2>A column, or a curve.</h2>
+          <p>Martha Graham made the spine the subject. Her <em>contraction</em> hollows the torso from the pelvis. Her <em>spiral</em> twists it around its own axis.</p>
+          <p>Set the torso to zero and Graham's body stands like a column. Turn it up and the contraction comes back.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">04 · Dynamics</p>
+          <h2>A long breath, or a drum.</h2>
+          <p>The same movement can be poured slowly or struck sharply. Watch the hand's trail. At low values it draws smooth arcs. At high values it snaps from place to place and holds.</p>
+          <p>Katherine Dunham's rhythmic, isolated hips and ribs live near the percussive end.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">05 · Initiation</p>
+          <h2>Hands first, or hips first.</h2>
+          <p>William Forsythe's improvisation tools start movement from imagined points and lines around the body. The hands draw, and the body follows.</p>
+          <p>Move initiation to the centre and the same figure starts from the pelvis. The arms go quiet and only follow.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">06 · Balance</p>
+          <h2>Keep it, or give it away.</h2>
+          <p>Doris Humphrey called dance "the arc between two deaths": standing still, and lying flat. José Limón built a technique in that arc. You fall, you catch yourself, you rebound.</p>
+          <p>At zero the body holds its balance. At the top it tips, suspends, and recovers.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">07 · Floor</p>
+          <h2>The floor as a partner.</h2>
+          <p>In older techniques the floor is mostly where class starts. In David Zambrano's Flying Low it is where the dance happens: you spiral in and out of the ground at speed.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">08 · Structure</p>
+          <h2>A vocabulary, or a set of instructions.</h2>
+          <p>Some techniques are set exercises you repeat until they become yours. Others give you images and tasks and leave the shape to you.</p>
+          <p>Gaga, Ohad Naharin's practice, has no mirrors and no fixed steps. As the number drops, the regular rhythm breaks up and wanders.</p>
+          <p class="step-values"></p>
+        </article>
+
+        <article class="step">
+          <p class="eyebrow">09 · Contact</p>
+          <h2>One body becomes two.</h2>
+          <p>The last number is the other person. In 1972 Steve Paxton made a form whose whole subject is a moving point of touch: Contact Improvisation. Two dancers lean, give and take weight.</p>
+          <p>Eight numbers, then. Next: what happens when we put every technique into the same space?</p>
+          <p class="step-values"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ Morphospace ============ -->
+    <section id="space" class="panel">
+      <header class="panel-head">
+        <p class="eyebrow">10 · The space</p>
+        <h2>Twelve techniques in one space.</h2>
+        <p>Each technique is a point with eight coordinates. Eight dimensions can't be drawn, so they are squeezed into three (principal component analysis). Those three keep <strong id="morph-variance-total"></strong> of the differences between techniques. Points that sit close together ask the body similar things. The grey arrows show which way each original number pulls.</p>
+        <p class="muted mono" id="morph-variance"></p>
+      </header>
+      <div id="morph-canvas" class="morph-canvas">
+        <p class="canvas-hint">Drag to rotate · scroll to zoom · tap a technique</p>
+      </div>
+      <p class="panel-foot">Most of the cube is empty. Like Raup's shells, the techniques people have actually developed fill only a small part of what is possible.</p>
+    </section>
+
+    <!-- ============ Similarity ============ -->
+    <section id="kinship" class="panel">
+      <header class="panel-head">
+        <p class="eyebrow">11 · Kinship</p>
+        <h2>Who resembles whom.</h2>
+        <p>Similarity is 1 minus the distance between two techniques' eight numbers, scaled to a 0–100 range. The rows are ordered by the first principal component, so related techniques sit next to each other. Tap a square to compare a pair.</p>
+      </header>
+      <div class="kinship-grid">
+        <div class="scroll-x"><div id="heatmap" class="heatmap"></div></div>
+        <aside id="pair" class="pair"></aside>
+      </div>
+    </section>
+
+    <!-- ============ Lineage ============ -->
+    <section id="lineage-sec" class="panel">
+      <header class="panel-head">
+        <p class="eyebrow">12 · Lineage</p>
+        <h2>Who learned from whom.</h2>
+        <p>Similarity and ancestry don't always match. Cunningham danced for Graham and then rejected most of what she taught. Gaga comes from a Graham-trained dancer, yet in the space it sits closer to Forsythe and Countertechnique than to Graham.</p>
+      </header>
+      <div class="scroll-x"><div id="lineage" class="lineage"></div></div>
+    </section>
+
+    <!-- ============ Explorer ============ -->
+    <section id="explore" class="panel explore">
+      <header class="panel-head">
+        <p class="eyebrow">13 · Your turn</p>
+        <h2>Invent a technique.</h2>
+        <p>Set the eight numbers, watch the figure dance them, and see which existing techniques yours is closest to. Your technique also shows up as a marker in the morphospace above.</p>
+      </header>
+      <div class="explore-grid">
+        <div id="explore-figure" class="explore-figure"></div>
+        <div class="explore-controls">
+          <div id="sliders" class="sliders"></div>
+          <div class="explore-actions">
+            <button id="randomise" class="btn">Random technique</button>
+          </div>
+          <h4>Closest techniques</h4>
+          <ul id="explore-nearest" class="nn"></ul>
+          <h4>Start from</h4>
+          <div id="presets" class="presets"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>About the numbers.</strong> The scores are interpretations, not measurements. Each technique card explains its numbers. Disagree? Edit <code>src/data/techniques.json</code> and the essay, the space, the matrix and the explorer all update.</p>
+      <p class="muted">Inspired by Raup's 1966 shell morphospace. Built with Three.js and D3.</p>
+    </footer>
+
+    <aside id="drawer" class="drawer" hidden aria-label="Technique details">
+      <button id="drawer-close" class="drawer-close" aria-label="Close">✕</button>
+      <div id="drawer-body"></div>
+    </aside>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
