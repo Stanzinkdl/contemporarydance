@@ -31,6 +31,7 @@
         <a href="#kinship">Similarity</a>
         <a href="#lineage-sec">Lineage</a>
         <a href="#explore">Explore</a>
+        <a href="#recorded">Recorded</a>
         <button id="theme-toggle" class="ghost"></button>
       </nav>
     </header>
@@ -217,6 +218,7 @@
           <div class="explore-actions">
             <button id="randomise" class="btn">Random technique</button>
           </div>
+          <p class="muted small">Dancing the class material of <strong id="explore-phrase-name"></strong>, shaped by your numbers.</p>
           <h4>Closest techniques</h4>
           <ul id="explore-nearest" class="nn"></ul>
           <h4>Start from</h4>
@@ -225,9 +227,38 @@
       </div>
     </section>
 
+    <!-- ============ Motion capture ============ -->
+    <section id="recorded" class="panel">
+      <header class="panel-head">
+        <p class="eyebrow">16 · Recorded dancers</p>
+        <h2>The same skeleton, moved by a real dancer.</h2>
+        <p>Everything above is choreographed from each technique's class material. These clips are different: they are motion-capture recordings of two dancers improvising modern-dance material, played back on the same anatomical skeleton. Only the recorded joint rotations are used, so the bones keep their real proportions. The recordings aren't labelled by technique, but they show what real weight shifts, turns and arm paths look like. Try them at quarter speed.</p>
+      </header>
+      <div class="mocap-grid">
+        <div id="mocap-canvas" class="mocap-canvas">
+          <div class="style-toggle" role="group" aria-label="Figure style">
+            <button data-style="skeleton">Skeleton</button><button data-style="body">Body</button>
+          </div>
+          <div class="mocap-bar"><i id="mocap-progress"></i></div>
+        </div>
+        <div class="mocap-side">
+          <h3 id="mocap-title">Loading…</h3>
+          <p id="mocap-note" class="muted small"></p>
+          <div class="mocap-controls">
+            <button id="mocap-play" class="btn">Pause</button>
+            <label class="mocap-speed">Speed <input id="mocap-speed" type="range" min="0.1" max="1.5" step="0.05" value="1" /> <output id="mocap-speed-out">1.00×</output></label>
+          </div>
+          <h4>Recordings</h4>
+          <div id="mocap-clips" class="mocap-clips"></div>
+        </div>
+      </div>
+    </section>
+
     <footer class="footer">
       <p><strong>About the numbers.</strong> The scores are interpretations, not measurements. Each technique card explains its numbers. Disagree? Edit <code>src/data/techniques.json</code> and the essay, the space, the matrix and the explorer all update.</p>
       <p class="muted">Inspired by Raup's 1966 shell morphospace. Built with Three.js and D3.</p>
+      <p class="muted small"><strong>Skeleton:</strong> BodyParts3D, © The Database Center for Life Science, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution 4.0 International</a> (earlier releases: CC BY-SA 2.1 Japan). Bones simplified and rigged for this project.<br />
+      <strong>Motion capture:</strong> The data used in this project was obtained from <a href="http://mocap.cs.cmu.edu/" target="_blank" rel="noopener">mocap.cs.cmu.edu</a>. The database was created with funding from NSF EIA-0196217.</p>
     </footer>
 
     <aside id="drawer" class="drawer" hidden aria-label="Technique details">

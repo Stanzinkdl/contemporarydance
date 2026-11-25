@@ -340,3 +340,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .db-track em { position: absolute; top: -1px; height: 4px; background: var(--muted); opacity: 0.5; }
 .db-track i { position: absolute; top: -5px; width: 12px; height: 12px; border-radius: 50%; transform: translateX(-50%); border: 2px solid var(--surface); }
 .pair p { font-size: 0.85rem; line-height: 1.55; }
+
+/* ---------- Motion capture ---------- */
+.mocap-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr); gap: 2rem; align-items: start; }
+@media (max-width: 900px) { .mocap-grid { grid-template-columns: 1fr; } }
+.mocap-canvas { position: relative; height: min(72vh, 640px); background: var(--surface); border-radius: 14px; overflow: hidden; }
+.mocap-canvas canvas { display: block; width: 100% !important; height: 100% !important; }
+.mocap-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--line); }
+.mocap-bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+.mocap-side h3 { margin-bottom: 0.2rem; }
+.mocap-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin: 1rem 0; }
+.mocap-speed { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
+.mocap-speed input { accent-color: var(--accent); }
+.mocap-speed output { font: 0.75rem var(--mono); color: var(--muted); min-width: 3.5em; }
+.mocap-clips { display: grid; gap: 0.4rem; }
+.mocap-clips button {
+  display: flex; justify-content: space-between; gap: 1rem; text-align: left;
+  background: none; border: 1px solid var(--line); border-radius: 10px; padding: 0.6rem 0.8rem; font-size: 0.85rem;
+}
+.mocap-clips button span { font: 0.72rem var(--mono); color: var(--muted); white-space: nowrap; }
+.mocap-clips button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }

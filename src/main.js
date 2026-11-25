@@ -3,6 +3,7 @@ import data from './data/techniques.json';
 import { toVector, similarityMatrix, pca, nearest, compareAxes } from './similarity.js';
 import { createFigureScene } from './figure.js';
 import { createMorphospace } from './morphospace.js';
+import { createMocapScene } from './mocap.js';
 import { drawHeatmap, drawLineage, drawRadar } from './charts.js';
 
 // ---------- Data prep ----------
@@ -49,16 +50,17 @@ syncStyleButtons();
 // Each step lists keyframes. A keyframe is a technique id, or a technique id
 // with one or more axes overridden — so a step can turn one number at a time.
 const NEUTRAL = { grounding: 0.2, torso: 0.15, dynamics: 0.3, floor: 0, initiation: 0.5, structure: 0.95, fall: 0.05, contact: 0 };
+// `phrase` picks which technique's class material the figure dances.
 const STEPS = [
-  { focus: null, keys: [NEUTRAL] },
-  { focus: 'grounding', keys: [{ base: 'butoh', grounding: 0.05 }, 'butoh'] },
-  { focus: 'torso', keys: [{ base: 'graham', torso: 0.05 }, 'graham'] },
-  { focus: 'dynamics', keys: [{ base: 'dunham', dynamics: 0.05 }, { base: 'dunham', dynamics: 0.95 }] },
-  { focus: 'initiation', keys: ['forsythe', { base: 'forsythe', initiation: 0.95 }] },
-  { focus: 'fall', keys: [{ base: 'limon', fall: 0.05 }, 'limon'] },
-  { focus: 'floor', keys: [{ base: 'flyinglow', floor: 0.0 }, 'flyinglow'] },
-  { focus: 'structure', keys: [{ base: 'gaga', structure: 1 }, 'gaga'] },
-  { focus: 'contact', keys: [{ base: 'contact', contact: 0 }, 'contact'] },
+  { focus: null, phrase: 'intro', keys: [NEUTRAL] },
+  { focus: 'grounding', phrase: 'butoh', keys: [{ base: 'butoh', grounding: 0.05 }, 'butoh'] },
+  { focus: 'torso', phrase: 'graham', keys: [{ base: 'graham', torso: 0.05 }, 'graham'] },
+  { focus: 'dynamics', phrase: 'dunham', keys: [{ base: 'dunham', dynamics: 0.05 }, { base: 'dunham', dynamics: 0.95 }] },
+  { focus: 'initiation', phrase: 'forsythe', keys: ['forsythe', { base: 'forsythe', initiation: 0.95 }] },
+  { focus: 'fall', phrase: 'limon', keys: [{ base: 'limon', fall: 0.05 }, 'limon'] },
+  { focus: 'floor', phrase: 'flyinglow', keys: [{ base: 'flyinglow', floor: 0.0 }, 'flyinglow'] },
+  { focus: 'structure', phrase: 'gaga', keys: [{ base: 'gaga', structure: 1 }, 'gaga'] },
+  { focus: 'contact', phrase: 'contact', keys: [{ base: 'contact', contact: 0 }, 'contact'] },
 ];
 
 function resolveKey(k) {
@@ -129,7 +131,7 @@ function onScroll() {
     const k = Math.min(n - 2, Math.floor(f));
     params = lerpParams(step.frames[k], step.frames[k + 1], f - k);
   }
-  figure.setTarget(params);
+  figure.setTarget(params, step.phrase);
 
   if (idx !== activeStep) {
     activeStep = idx;
@@ -542,9 +544,11 @@ function setExplorer(params) {
 function updateExplorer() {
   const p = readExplorer();
   sliders.querySelectorAll('output').forEach((o) => (o.textContent = fmt(p[o.dataset.out])));
-  explorerFigure.setTarget(p);
   const vec = axes.map((a) => p[a.id]);
   const nn = nearest(vec, techniques, 3);
+  // Dance the class material of the nearest technique, shaped by the sliders.
+  explorerFigure.setTarget(p, nn[0].item.id);
+  $('#explore-phrase-name').textContent = nn[0].item.name;
   $('#explore-nearest').innerHTML = nn
     .map((n) => `<li>${chip(n.item)}<span class="bar"><i style="width:${pct(n.sim)};background:${n.item.color}"></i></span><span>${pct(n.sim)}</span></li>`)
     .join('');
@@ -565,3 +569,39 @@ themeBtn.addEventListener('click', () => {
   // Charts and 3D materials read CSS colours at build time, so reload to repaint them.
   location.reload();
 });
+
+// ---------- Recorded dancers (motion capture) ----------
+const mocap = createMocapScene($('#mocap-canvas'), {
+  style: figStyle,
+  onClip: (clip) => {
+    $('#mocap-title').textContent = clip.title;
+    $('#mocap-note').textContent = `${clip.note} · ${(clip.frames.length / clip.fps).toFixed(1)} s`;
+  },
+});
+figures.push(mocap);
+fetch(`${import.meta.env.BASE_URL}mocap/index.json`)
+  .then((r) => r.json())
+  .then(({ clips }) => {
+    const list = $('#mocap-clips');
+    list.innerHTML = clips.map((c, i) => `<button data-clip="${c.id}" aria-pressed="${i === 0}">${c.title}<span>${c.seconds} s</span></button>`).join('');
+    list.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-clip]');
+      if (!b) return;
+      list.querySelectorAll('[data-clip]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      mocap.load(b.dataset.clip);
+    });
+    mocap.load(clips[0].id);
+  })
+  .catch(() => ($('#mocap-title').textContent = 'Recordings unavailable'));
+$('#mocap-play').addEventListener('click', (e) => {
+  mocap.setPlaying(!mocap.isPlaying());
+  e.currentTarget.textContent = mocap.isPlaying() ? 'Pause' : 'Play';
+});
+$('#mocap-speed').addEventListener('input', (e) => {
+  mocap.setSpeed(+e.target.value);
+  $('#mocap-speed-out').textContent = `${(+e.target.value).toFixed(2)}×`;
+});
+(function mocapProgress() {
+  $('#mocap-progress').style.width = `${mocap.progress() * 100}%`;
+  requestAnimationFrame(mocapProgress);
+})();
